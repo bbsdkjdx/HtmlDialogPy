@@ -6,6 +6,7 @@
 #include "HtmlDialogPy.h"
 #include "HtmlDialogPyDlg.h"
 #include "afxdialogex.h"
+#include "python_support.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -43,6 +44,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
+
 // CHtmlDialogPyDlg ¶Ô»°¿ò
 
 BEGIN_DHTML_EVENT_MAP(CHtmlDialogPyDlg)
@@ -51,10 +53,17 @@ BEGIN_DHTML_EVENT_MAP(CHtmlDialogPyDlg)
 END_DHTML_EVENT_MAP()
 
 
+BEGIN_DISPATCH_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
+	DISP_FUNCTION(CHtmlDialogPyDlg, "ext_fun", ext_fun, VT_BSTR, VTS_BSTR)
+END_DISPATCH_MAP()
+
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 	: CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	EnableAutomation();
+	SetExternalDispatch(GetIDispatch(TRUE));
 }
 
 void CHtmlDialogPyDlg::DoDataExchange(CDataExchange* pDX)
@@ -162,4 +171,17 @@ HRESULT CHtmlDialogPyDlg::OnButtonCancel(IHTMLElement* /*pElement*/)
 {
 	OnCancel();
 	return S_OK;
+}
+
+
+wchar_t* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
+{
+	PySetStrW(para,0);
+	PyEvalA("stack__[0]*10");
+	return PyGetStr();
+}
+
+BOOL CHtmlDialogPyDlg::CanAccessExternal()
+{
+	return TRUE;
 }

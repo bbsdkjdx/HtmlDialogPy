@@ -32,4 +32,8 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	DECLARE_DHTML_EVENT_MAP()
+	DECLARE_DISPATCH_MAP()
+public:
+	wchar_t* ext_fun(wchar_t* para);
+	virtual BOOL CanAccessExternal();
 };
