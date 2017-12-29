@@ -29,6 +29,8 @@ public:
 // 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+//	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -80,8 +82,9 @@ END_MESSAGE_MAP()
 
 BOOL CHtmlDialogPyDlg::OnInitDialog()
 {
+	SetHostFlags(DOCHOSTUIFLAG_FLAT_SCROLLBAR | DOCHOSTUIFLAG_NO3DBORDER);//add scroll bar.
 	CDHtmlDialog::OnInitDialog();
-
+	m_pBrowserApp->put_Silent(VARIANT_TRUE);// disable script error box.
 	// 将“关于...”菜单项添加到系统菜单中。
 
 	// IDM_ABOUTBOX 必须在系统命令范围内。
@@ -177,11 +180,71 @@ HRESULT CHtmlDialogPyDlg::OnButtonCancel(IHTMLElement* /*pElement*/)
 wchar_t* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
 {
 	PySetStrW(para,0);
-	PyEvalA("stack__[0]*10");
-	return PyGetStr();
+	PyExecA("msgbox(stack__[0])");
+	return _T("ok");
 }
 
+//disable safe warning.
 BOOL CHtmlDialogPyDlg::CanAccessExternal()
 {
 	return TRUE;
+}
+
+//hook contex menu.
+HRESULT STDMETHODCALLTYPE CHtmlDialogPyDlg::ShowContextMenu(DWORD dwID, POINT *ppt, IUnknown *pcmdtReserved, IDispatch *pdispReserved)
+{
+	return CDHtmlDialog::ShowContextMenu(dwID,ppt,pcmdtReserved,pdispReserved);
+}
+
+//hook accelerator.
+HRESULT STDMETHODCALLTYPE CHtmlDialogPyDlg::TranslateAccelerator(LPMSG lpMsg,
+	const GUID *pguidCmdGroup,
+	DWORD nCmdID)
+{
+	if (lpMsg && lpMsg->message == WM_KEYDOWN)
+	{
+		bool bCtrl = (0x80 == (0x80 & GetKeyState(VK_CONTROL)));
+
+		// prevent Ctrl+N
+		if (lpMsg->wParam == 'N' && bCtrl)
+		{
+			return S_OK;
+		}
+
+		// prevent Ctrl+F
+		if (lpMsg->wParam == 'F' && bCtrl)
+		{
+			return S_OK;
+		}
+
+		// prevent F5
+		if (lpMsg->wParam == VK_F5)
+		{
+			return S_OK;
+		}
+
+		// prevent ESC
+		if (lpMsg->wParam == VK_ESCAPE)
+		{
+			return S_OK;
+		}
+
+		// prevent ENTER
+		if (lpMsg->wParam == VK_RETURN)
+		{
+			return S_OK;
+		}
+	}
+	return CDHtmlDialog::TranslateAccelerator(lpMsg, pguidCmdGroup, nCmdID);
+}
+
+
+
+BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == 256 && pMsg->wParam == 123 && GetAsyncKeyState(0x11) & 0x8000)//Ctrl+F12 pressed.
+	{
+		InteractInConsole(m_hWnd, false);
+	}
+	return CDHtmlDialog::PreTranslateMessage(pMsg);
 }

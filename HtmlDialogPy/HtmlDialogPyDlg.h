@@ -36,4 +36,7 @@ protected:
 public:
 	wchar_t* ext_fun(wchar_t* para);
 	virtual BOOL CanAccessExternal();
+	virtual HRESULT STDMETHODCALLTYPE ShowContextMenu(DWORD dwID, POINT *ppt, IUnknown *pcmdtReserved, IDispatch *pdispReserved);
+	STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID *pguidCmdGroup, DWORD nCmdID);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

@@ -1,21 +1,76 @@
+
+<!-- 
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312"/>
 </HEAD>
-<BODY ID=CHtmlDialogPyDlg BGCOLOR=LIGHTGREY style="font-family:MS Shell Dlg;font-size:9">
+    <style>
+        body {
+            background-color: #d0e4fe;
+        }
 
-<TABLE WIDTH=100% HEIGHT=100%>
-<TR WIDTH=100% HEIGHT=45%>
-<TD ALIGN=CENTER VALIGN=BOTTOM>
-TODO:  在此放置控件。
-</TD>
-</TR>
-<TR WIDTH=100% HEIGHT=100%>
-<TD ALIGN=RIGHT VALIGN=BOTTOM>
-<BUTTON STYLE="WIDTH:100" ID="ButtonOK">确定</BUTTON>&nbsp;<BUTTON STYLE="WIDTH:100" ID="ButtonCancel">取消</BUTTON>
-</TD>
-</TR>
-</TABLE>
-    <input id="Button1" type="button" value="Button1" name="Button1" onclick="alert(external.ext_fun('abc'));">
-</BODY>
-</HTML>
+        h1 {
+            color: orange;
+            text-align: center;
+        }
+
+        p {
+            font-family: "Times New Roman";
+            font-size: 50px;
+        }
+    </style>
+<body id=CHtmlDialogPyDlg bgcolor=LIGHTGREY style="font-family:MS Shell Dlg;font-size:9">
+
+    <table width=100% height=100%>
+        <tr width=100% height=45%>
+            <td align=CENTER valign=BOTTOM>
+                TODO:  在此放置控件。
+            </td>
+        </tr>
+        <tr width=100% height=100%>
+            <td align=RIGHT valign=BOTTOM>
+                <button style="WIDTH:100" id="ButtonOK">确定</button>&nbsp;<button style="WIDTH:100" id="ButtonCancel">取消</button>
+                <input id="Button1" type="button" value="Button1" name="Button1" onclick="external.ext_fun(navigator.appVersion);">
+            </td>
+        </tr>
+    </table>
+</body>
+</HTML>    
+--> 
+
+<!--
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    
+-->
+
+<<!DOCTYPE html>
+<html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+<head>
+    <style>
+        div {
+            width: 100px;
+            height: 75px;
+            background-color: yellow;
+            border: 1px solid black;
+        }
+
+            div#div2 {
+                transform: rotate(30deg);
+                -ms-transform: rotate(30deg); /* IE 9 */
+                -moz-transform: rotate(30deg); /* Firefox */
+                -webkit-transform: rotate(30deg); /* Safari and Chrome */
+                -o-transform: rotate(30deg); /* Opera */
+            }
+    </style>
+</head>
+<body>
+    <input id="Button1" type="button" value="Button1" name="Button1" onclick="external.ext_fun(navigator.appVersion);">
+
+    <div>你好。这是一个 div 元素。</div>
+
+    <div id="div2">你好。这是一个 div 元素。</div>
+    <a href='http://www.csdn.net'>csdn</a>
+</body>
+</html>
