@@ -56,6 +56,10 @@
     <None Include="res\HtmlDialogPy.rc2">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="res\json2.js" />
+    <None Include="res\js2.bin">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HtmlDialogPy.rc">
