@@ -176,12 +176,11 @@ HRESULT CHtmlDialogPyDlg::OnButtonCancel(IHTMLElement* /*pElement*/)
 	return S_OK;
 }
 
-
-wchar_t* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
+WCHAR* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
 {
 	PySetStrW(para,0);
-	PyExecA("msgbox(stack__[0])");
-	return _T("ok");
+	PyEvalA("_js_fun()");
+	return CComBSTR (PyGetStr());
 }
 
 //disable safe warning.

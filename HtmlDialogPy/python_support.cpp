@@ -8,7 +8,7 @@ PyObject  *pModule = nullptr;
 
 
 char *pre_code =
-"import ctypes,os,traceback\n"
+"import ctypes,os,traceback,json\n"
 
 //stack to transform parameters between exe and python.
 "stack__=[0]*50\n"
@@ -35,6 +35,14 @@ char *pre_code =
 "    if mod not in exe.__dict__:exe.__dict__[mod]=CAnything()\n"
 "    exe.__dict__[mod].__dict__[fnn] = eval(cmd)\n"
 "    exe.__dict__[mod].__dict__[fnn].__doc__=doc\n"
+//treate js call,use stack__[0] as para.
+"def _js_fun():\n"
+"    try:\n"
+"        name,para=json.loads(stack__[0])\n"
+"        fun=eval(name)\n"
+"        return json.dumps(fun(*para))\n"
+"    except Exception as exp:\n"
+"        return json.dumps(str(exp))\n"
 ;
 void _init_python()//call it before use other function else.
 {

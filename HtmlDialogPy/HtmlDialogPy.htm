@@ -1,6 +1,3 @@
-
-<!-- 
--->
 <script>
     if (typeof JSON !== "object") {
     JSON = {};
@@ -244,6 +241,12 @@
         }
     }());
 
+    function ExtFun(name,para)
+    {
+        s1 = JSON.stringify([name, para])
+        ret = external.ext_fun(s1)
+        return JSON.parse(ret)
+    }
 </script>
 
  <HTML>
@@ -266,7 +269,6 @@
         }
     </style>
 <body id=CHtmlDialogPyDlg bgcolor=LIGHTGREY style="font-family:MS Shell Dlg;font-size:9">
-    <script>alert(JSON.stringify([1,'abc',2,3,4,5]))</script>
     <table width=100% height=100%>
         <tr width=100% height=45%>
             <td align=CENTER valign=BOTTOM>
@@ -276,7 +278,7 @@
         <tr width=100% height=100%>
             <td align=RIGHT valign=BOTTOM>
                 <button style="WIDTH:100" id="ButtonOK">确定</button>&nbsp;<button style="WIDTH:100" id="ButtonCancel">取消</button>
-                <input id="Button1" type="button" value="Button1" name="Button1" onclick="external.ext_fun(navigator.appVersion);">
+                <input id="Button1" type="button" value="Button1" name="Button1" onclick="alert(ExtFun('add',[10,20]));">
             </td>
         </tr>
     </table>
