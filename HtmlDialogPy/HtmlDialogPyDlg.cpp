@@ -50,8 +50,8 @@ END_MESSAGE_MAP()
 // CHtmlDialogPyDlg 对话框
 
 BEGIN_DHTML_EVENT_MAP(CHtmlDialogPyDlg)
-	DHTML_EVENT_ONCLICK(_T("ButtonOK"), OnButtonOK)
-	DHTML_EVENT_ONCLICK(_T("ButtonCancel"), OnButtonCancel)
+	//DHTML_EVENT_ONCLICK(_T("ButtonOK"), OnButtonOK)
+	//DHTML_EVENT_ONCLICK(_T("ButtonCancel"), OnButtonCancel)
 END_DHTML_EVENT_MAP()
 
 
@@ -59,11 +59,28 @@ BEGIN_DISPATCH_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	DISP_FUNCTION(CHtmlDialogPyDlg, "ext_fun", ext_fun, VT_BSTR, VTS_BSTR)
 END_DISPATCH_MAP()
 
+
+CHtmlDialogPyDlg *gpdlg = nullptr;
+
+
+void test()
+{
+
+}
+
+
+bool call_js(WCHAR *para)
+{
+	if (!gpdlg)return false;
+
+	return false;
+}
+
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 	: CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
+	gpdlg = this;
 	EnableAutomation();
 	SetExternalDispatch(GetIDispatch(TRUE));
 }
@@ -111,8 +128,9 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
+	REG_EXE_FUN("", test, "#", "")
 
-	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+		return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
 void CHtmlDialogPyDlg::OnSysCommand(UINT nID, LPARAM lParam)

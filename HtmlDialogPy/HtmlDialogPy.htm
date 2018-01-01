@@ -1,4 +1,5 @@
 <script> 
+    //define JSON
     if (typeof JSON !== "object") {JSON = {};}(function () {"use strict";var rx_one = /^[\],:{}\s]*$/;var rx_two = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g;var rx_three = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g;var rx_four = /(?:^|:|,)(?:\s*\[)+/g;var rx_escapable = /[\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
         var rx_dangerous = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;function f(n) {return n < 10? "0" + n: n;}function this_value() {return this.valueOf();}if (typeof Date.prototype.toJSON !== "function") {Date.prototype.toJSON = function () {return isFinite(this.valueOf())? this.getUTCFullYear() + "-" +f(this.getUTCMonth() + 1) + "-" +f(this.getUTCDate()) + "T" +f(this.getUTCHours()) + ":" +f(this.getUTCMinutes()) + ":" +f(this.getUTCSeconds()) + "Z": null;};
             Boolean.prototype.toJSON = this_value;Number.prototype.toJSON = this_value;String.prototype.toJSON = this_value;}var gap;var indent;var meta;var rep;function quote(string) {rx_escapable.lastIndex = 0;return rx_escapable.test(string)? "\"" + string.replace(rx_escapable, function (a) {var c = meta[a];return typeof c === "string"? c: "\\u" + ("0000" + a.charCodeAt(0).toString(16)).slice(-4);}) + "\"": "\"" + string + "\"";}
@@ -8,8 +9,25 @@
             JSON.stringify = function (value, replacer, space) {var i;gap = "";indent = "";if (typeof space === "number") {for (i = 0; i < space; i += 1) {indent += " ";}} else if (typeof space === "string") {indent = space;}rep = replacer;if (replacer && typeof replacer !== "function" &&(typeof replacer !== "object" ||typeof replacer.length !== "number")) {throw new Error("JSON.stringify");}return str("", { "": value });};}
         if (typeof JSON.parse !== "function") {JSON.parse = function (text, reviver) {var j;function walk(holder, key) {var k;var v;var value = holder[key];if (value && typeof value === "object") {for (k in value) {if (Object.prototype.hasOwnProperty.call(value, k)) {v = walk(value, k);if (v !== undefined) {value[k] = v;} else {delete value[k];}}}}return reviver.call(holder, key, value); }text = String(text);rx_dangerous.lastIndex = 0;if (rx_dangerous.test(text)) {text = text.replace(rx_dangerous, function (a) {return "\\u" +("0000" + a.charCodeAt(0).toString(16)).slice(-4);});}
                 if (rx_one.test(text.replace(rx_two, "@").replace(rx_three, "]").replace(rx_four, ""))) {j = eval("(" + text + ")");return (typeof reviver === "function")? walk({ "": j }, ""): j;}throw new SyntaxError("JSON.parse");};}}());
-    function ExtFun(name, para) { s1 = JSON.stringify([name, para]); ret = external.ext_fun(s1); return JSON.parse(ret);}
-//the definition of JSON and ExtFun,used to call python function.
+
+    //call external function
+    function ExtFun(name, para) { s1 = JSON.stringify([name, para]); ret = external.ext_fun(s1); return JSON.parse(ret); }
+
+    //call js function
+    function CallJs(s)
+    {
+        try
+        {
+            data = JSON.parse(s);
+            fun=eval(data[0]);
+            para = data[1];
+            return JSON.stringify( fun(para) );
+        }
+        catch (err)
+        {
+            return JSON.stringify(err.message);
+        }
+    }
 </script>
 
  <HTML>
@@ -42,8 +60,14 @@
             <td align=RIGHT valign=BOTTOM>
                 <button style="WIDTH:100" id="ButtonOK">确定</button>&nbsp;<button style="WIDTH:100" id="ButtonCancel">取消</button>
                 <input id="Button1" type="button" value="Button1" name="Button1" onclick="alert(ExtFun('add',get_para()));">
+                <input id="Button2" type="button" value="Button2" name="Button2" onclick="display([1,2,3]);">
 
                 <script>
+                    function display(para)
+                    {
+                        a= para[0]
+                        alert(a)
+                    }
                     function get_para() {
                         fn = document.getElementById('idfn').value
                         ln = document.getElementById('idln').value
