@@ -39,7 +39,8 @@ char *pre_code =
 "    if mod not in exe.__dict__:exe.__dict__[mod]=CAnything()\n"
 "    exe.__dict__[mod].__dict__[fnn] = eval(cmd)\n"
 "    exe.__dict__[mod].__dict__[fnn].__doc__=doc\n"
-//treate js call,use stack__[0] as para.
+
+//treate js call exe,use stack__[0] as para.
 "def _js_fun():\n"
 "    try:\n"
 "        name,para=json.loads(stack__[0])\n"
@@ -47,7 +48,15 @@ char *pre_code =
 "        return json.dumps(fun(*para))\n"
 "    except Exception as exp:\n"
 "        return json.dumps(str(exp))\n"
+
+//treat exe call js. via exe.__call_js(),if exe function changed,you should change codes below.
+"def call_js(fun_name,paras):\n"
+"    s1=json.dumps([fun_name,paras])\n"
+"    s2=exe.__call_js(s1)\n"
+"    return json.loads(s2)\n"
 ;
+
+
 void _init_python()//call it before use other function else.
 {
 	Py_Initialize(); 

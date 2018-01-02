@@ -63,7 +63,7 @@ END_DISPATCH_MAP()
 CHtmlDialogPyDlg *gpHtmlDialogPyDlg = nullptr;
 
 
-WCHAR *call_js(WCHAR *para)
+WCHAR *__call_js(WCHAR *para)
 {
 	if (!gpHtmlDialogPyDlg)return false;
 	gpHtmlDialogPyDlg->m_str_tmp = para;
@@ -125,7 +125,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
-	REG_EXE_FUN("", call_js, "SS", "")
+	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
 
 		return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -267,7 +267,7 @@ afx_msg LRESULT CHtmlDialogPyDlg::OnCallJs(WPARAM wParam, LPARAM lParam)
 	}
 
 	DISPID   dispid;
-	CComBSTR objbstrValue = _T("display");
+	CComBSTR objbstrValue = _T("CallJs");
 	BSTR bstrValue = objbstrValue.Copy();
 	OLECHAR *pszFunct = bstrValue;
 	hResult = pDispScript->GetIDsOfNames(IID_NULL,
