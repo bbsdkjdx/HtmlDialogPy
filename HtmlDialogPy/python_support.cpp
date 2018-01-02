@@ -8,14 +8,16 @@ PyObject  *pModule = nullptr;
 
 
 char *pre_code =
-"import ctypes,os,traceback,json\n"
+"import traceback as _traceback\n"
+"import ctypes as _ctypes\n"
+"import json as _json\n"
 
 //stack to transform parameters between exe and python.
-"stack__=[0]*50\n"
+"stack=[0]*50\n"
 
 //show message box before foreground window.
 "def msgbox(s,title=''):\n"
-" ctypes.windll.user32.MessageBoxW(ctypes.windll.user32.GetForegroundWindow(),str(s),title,0x40)\n"
+" _ctypes.windll.user32.MessageBoxW(_ctypes.windll.user32.GetForegroundWindow(),str(s),title,0x40)\n"
 
 //define exe funciton management class,exe is the object,type it can see all functions.
 "class CAnything(object):\n"
@@ -23,13 +25,13 @@ char *pre_code =
 "        dic=self.__dict__\n"
 "        return '\\n**************************************************\\n'.join((x+'\\n'+dic[x].__dict__.get('__doc__','') for x in dic))\n"
 "exe=CAnything()\n"
-"def build_exe_fun__(mod,fnn, fmt, adr,doc):\n"
-"    dic = {'#': 'ctypes.c_void_p', \n"
-"           's':'ctypes.c_char_p','S': 'ctypes.c_wchar_p',\n"
-"           'l': 'ctypes.c_int32', 'u': 'ctypes.c_uint32',\n"
-"           'L': 'ctypes.c_int64', 'U': 'ctypes.c_uint64',\n"
-"           'f': 'ctypes.c_float', 'F': 'ctypes.c_double'}\n"
-"    cmd = 'ctypes.CFUNCTYPE('\n"
+"def _build_exe_fun__(mod,fnn, fmt, adr,doc):\n"
+"    dic = {'#': '_ctypes.c_void_p', \n"
+"           's':'_ctypes.c_char_p','S': '_ctypes.c_wchar_p',\n"
+"           'l': '_ctypes.c_int32', 'u': '_ctypes.c_uint32',\n"
+"           'L': '_ctypes.c_int64', 'U': '_ctypes.c_uint64',\n"
+"           'f': '_ctypes.c_float', 'F': '_ctypes.c_double'}\n"
+"    cmd = '_ctypes.CFUNCTYPE('\n"
 "    cmd += ','.join(map(lambda x: dic[x], fmt))\n"
 "    cmd += ')('+str(adr)+')'\n"
 "    if not mod:\n"
@@ -40,20 +42,27 @@ char *pre_code =
 "    exe.__dict__[mod].__dict__[fnn] = eval(cmd)\n"
 "    exe.__dict__[mod].__dict__[fnn].__doc__=doc\n"
 
-//treate js call exe,use stack__[0] as para.
+//treate js call exe,use stack[0] as para.
 "def _js_fun():\n"
 "    try:\n"
-"        name,para=json.loads(stack__[0])\n"
+"        name,para=_json.loads(stack[0])\n"
 "        fun=eval(name)\n"
-"        return json.dumps(fun(*para))\n"
+"        return _json.dumps(fun(*para))\n"
 "    except Exception as exp:\n"
-"        return json.dumps(str(exp))\n"
+"        return _json.dumps(str(exp))\n"
 
 //treat exe call js. via exe.__call_js(),if exe function changed,you should change codes below.
-"def call_js(fun_name,paras):\n"
-"    s1=json.dumps([fun_name,paras])\n"
+"def _call_js(fun_name,paras):\n"
+"    s1=_json.dumps([fun_name,paras])\n"
 "    s2=exe.__call_js(s1)\n"
-"    return json.loads(s2)\n"
+"    return _json.loads(s2)\n"
+
+"class CJs(object):\n"
+"    def _proxy_fun(self, name, *args):\n"
+"        return _call_js(name,args)\n"
+"    def __getattr__(self, name):\n"
+"        return lambda *args : self._proxy_fun(name, *args)\n"
+"js=CJs()"
 ;
 
 
@@ -87,7 +96,7 @@ void PysetObj(PyObject *p, int idx)
 	if (idx > -1)
 	{
 		char buf[100];
-		sprintf_s(buf, "stack__[%d]="PY_TMP_NAME, idx);
+		sprintf_s(buf, "stack[%d]="PY_TMP_NAME, idx);
 		PyRun_SimpleString(buf);
 	}
 }
@@ -120,7 +129,7 @@ PyObject *PyGetObj(int idx)
 	if (idx > -1)
 	{
 		char buf[100];
-		sprintf_s(buf, PY_TMP_NAME"=stack__[%d]", idx);
+		sprintf_s(buf, PY_TMP_NAME"=stack[%d]", idx);
 		PyRun_SimpleString(buf);
 	}
 	if (pRet)Py_DECREF(pRet);
@@ -149,7 +158,7 @@ char *exe_cmd =
 "    __ok=1\n"
 "except Exception as exp:\n"
 "    import sys\n"
-"    "PY_TMP_NAME"=traceback.format_exc()\n"//+str(sys._getframe().f_locals)\n"
+"    "PY_TMP_NAME"=_traceback.format_exc()\n"//+str(sys._getframe().f_locals)\n"
 "    __ok=0"
 ;
 int PyExecW(wchar_t *arg)
@@ -172,7 +181,7 @@ char *eval_cmd =
 "    "PY_TMP_NAME"=eval("PY_TMP_NAME")\n"
 "    __ok=1\n"
 "except Exception as exp : \n"
-"    "PY_TMP_NAME" =traceback.format_exc()\n"
+"    "PY_TMP_NAME" =_traceback.format_exc()\n"
 "    __ok=0"
 ;
 int PyEvalW(wchar_t *arg)
@@ -196,7 +205,7 @@ char *evals_cmd =
 "    "PY_TMP_NAME"=str(eval("PY_TMP_NAME"))\n"
 "    __ok=1\n"
 "except Exception as exp : \n"
-"    "PY_TMP_NAME" =traceback.format_exc()\n"
+"    "PY_TMP_NAME" =_traceback.format_exc()\n"
 "    __ok=0"
 ;
 wchar_t *PyEvalOrExecW(wchar_t *arg)
@@ -222,15 +231,15 @@ int PyRunFile(wchar_t *fn)
 	return PyExecW(_T("exec(open(__c2p2c__).read())"));
 }
 
-//'#':'ctypes.c_void_p', 
-//'s' : 'ctypes.c_char_p','S' : 'ctypes.c_wchar_p',
-//'l' : 'ctypes.c_int32', 'u' : 'ctypes.c_uint32',
-//'L' : 'ctypes.c_int64', 'U' : 'ctypes.c_uint64',
-//'f' : 'ctypes.c_float', 'F' : 'ctypes.c_double' 
+//'#':'_ctypes.c_void_p', 
+//'s' : '_ctypes.c_char_p','S' : '_ctypes.c_wchar_p',
+//'l' : '_ctypes.c_int32', 'u' : '_ctypes.c_uint32',
+//'L' : '_ctypes.c_int64', 'U' : '_ctypes.c_uint64',
+//'f' : '_ctypes.c_float', 'F' : '_ctypes.c_double' 
 void reg_exe_fun(char *mod,char *fnn, char *fmt, void *pfn,char *doc)
 {
 	CGIL gil;
-	PyObject_CallMethod(pModule, "build_exe_fun__", "sssIs",mod, fnn, fmt, pfn,doc);
+	PyObject_CallMethod(pModule, "_build_exe_fun__", "sssIs",mod, fnn, fmt, pfn,doc);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +265,7 @@ void _InteractInConsole(void *para)
 		HANDLE hdlWrite = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute((HANDLE)hdlWrite, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-		char *cmd1 = "import sys;sys.stdout=open('CONOUT$', 'wt');sys.stderr=sys.stdout;sys.stdin=open('CONIN$', 'rt')";
+		char *cmd1 = "import sys as _sys;_sys.stdout=open('CONOUT$', 'wt');_sys.stderr=_sys.stdout;_sys.stdin=open('CONIN$', 'rt')";
 		if (!PyExecA(cmd1))AfxMessageBox(PyGetStr());
 		SetConsoleCtrlHandler(0, true);//handle Ctrl+C.
 	}
@@ -266,7 +275,7 @@ void _InteractInConsole(void *para)
 	SetForegroundWindow(hwn);
 
 //	HANDLE hdlRead = GetStdHandle(STD_INPUT_HANDLE);
-	char *cmd2 = "import code;code.interact(banner='', readfunc=None, local=locals())";
+	char *cmd2 = "import code as _code;_code.interact(banner='', readfunc=None, local=locals())";
 	if (!PyExecA(cmd2))AfxMessageBox(PyGetStr());
 
 

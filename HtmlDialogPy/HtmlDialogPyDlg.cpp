@@ -20,17 +20,17 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 对话框数据
+	// 对话框数据
 	enum { IDD = IDD_ABOUTBOX };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 实现
+	// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-//	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	//	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -72,8 +72,8 @@ WCHAR *__call_js(WCHAR *para)
 }
 
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
-	: CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
-	, m_str_tmp(_T(""))
+: CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
+, m_str_tmp(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpHtmlDialogPyDlg = this;
@@ -101,7 +101,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 
 	CDHtmlDialog::OnInitDialog();
 
-    // disable script error box.
+	// disable script error box.
 	m_pBrowserApp->put_Silent(VARIANT_TRUE);
 
 	// IDM_ABOUTBOX 必须在系统命令范围内。
@@ -130,7 +130,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	// TODO:  在此添加额外的初始化代码
 	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
 
-		return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
 void CHtmlDialogPyDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -185,9 +185,9 @@ HCURSOR CHtmlDialogPyDlg::OnQueryDragIcon()
 
 WCHAR* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
 {
-	PySetStrW(para,0);
+	PySetStrW(para, 0);
 	PyEvalA("_js_fun()");
-	return CComBSTR (PyGetStr());
+	return CComBSTR(PyGetStr());
 }
 
 //disable safe warning.
@@ -253,9 +253,9 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 	{
 		InteractInConsole(m_hWnd, false);
 	}
-	if (pMsg->message==1024)//disable retriving document by WM_HTML_GETOBJECT.
+	if (pMsg->message == 1024)//disable retriving document by WM_HTML_GETOBJECT.
 	{
-	//	if (MessageBoxA(m_hWnd,"是否允许获取html文档？","收到WM_HTML_GETOBJECT",MB_YESNO|MB_ICONWARNING)==IDNO)
+		//	if (MessageBoxA(m_hWnd,"是否允许获取html文档？","收到WM_HTML_GETOBJECT",MB_YESNO|MB_ICONWARNING)==IDNO)
 		{
 			return TRUE;
 		}
