@@ -28,6 +28,11 @@
             return JSON.stringify(err.message);
         }
     }
+
+    function display(para) {
+        alert(para)
+        return 'ok.'
+    }
 </script>
 
  <HTML>
@@ -63,11 +68,7 @@
                 <input id="Button2" type="button" value="Button2" name="Button2" onclick="display([1,2,3]);">
 
                 <script>
-                    function display(para)
-                    {
-                        a= para[0]
-                        alert(a)
-                    }
+
                     function get_para() {
                         fn = document.getElementById('idfn').value
                         ln = document.getElementById('idln').value

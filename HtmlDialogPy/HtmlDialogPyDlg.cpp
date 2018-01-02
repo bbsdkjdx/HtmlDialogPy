@@ -69,15 +69,17 @@ void test()
 }
 
 
-bool call_js(WCHAR *para)
+WCHAR *call_js(WCHAR *para)
 {
 	if (!gpdlg)return false;
-
-	return false;
+	gpdlg->m_str_tmp = para;
+	gpdlg->SendMessage(WM_CALL_JS);
+	return gpdlg->m_str_tmp.GetBuffer();
 }
 
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 	: CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
+	, m_str_tmp(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpdlg = this;
@@ -92,6 +94,7 @@ void CHtmlDialogPyDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	ON_WM_SYSCOMMAND()
+	ON_MESSAGE(WM_CALL_JS, &CHtmlDialogPyDlg::OnCallJs)
 END_MESSAGE_MAP()
 
 
@@ -128,7 +131,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
-	REG_EXE_FUN("", test, "#", "")
+	REG_EXE_FUN("", call_js, "SS", "")
 
 		return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -182,17 +185,6 @@ HCURSOR CHtmlDialogPyDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-HRESULT CHtmlDialogPyDlg::OnButtonOK(IHTMLElement* /*pElement*/)
-{
-	OnOK();
-	return S_OK;
-}
-
-HRESULT CHtmlDialogPyDlg::OnButtonCancel(IHTMLElement* /*pElement*/)
-{
-	OnCancel();
-	return S_OK;
-}
 
 WCHAR* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
 {
@@ -264,4 +256,53 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 		InteractInConsole(m_hWnd, false);
 	}
 	return CDHtmlDialog::PreTranslateMessage(pMsg);
+}
+
+
+afx_msg LRESULT CHtmlDialogPyDlg::OnCallJs(WPARAM wParam, LPARAM lParam)
+{
+	IHTMLDocument2* pDoc2 = NULL;
+	VARIANT varResult;
+	CDHtmlDialog::GetDHtmlDocument(&pDoc2);
+	IDispatch *pDispScript = NULL;
+	HRESULT hResult;
+	hResult = pDoc2->get_Script(&pDispScript);
+	if (FAILED(hResult))
+	{
+		return 0;
+	}
+
+	DISPID   dispid;
+	CComBSTR objbstrValue = _T("display");
+	BSTR bstrValue = objbstrValue.Copy();
+	OLECHAR *pszFunct = bstrValue;
+	hResult = pDispScript->GetIDsOfNames(IID_NULL,
+		&pszFunct,
+		1,
+		LOCALE_SYSTEM_DEFAULT,
+		&dispid);
+	if (FAILED(hResult))
+	{
+		pDispScript->Release();
+		return 0;
+	}
+	DISPPARAMS dispParams;
+	VARIANTARG var;
+	dispParams.cArgs = 1;
+	dispParams.cNamedArgs = 0;
+	dispParams.rgdispidNamedArgs = NULL;
+	dispParams.rgvarg = &var;
+	dispParams.rgvarg[0].vt = VT_BSTR;
+	dispParams.rgvarg[0].bstrVal = CComBSTR(m_str_tmp.GetBuffer());
+	varResult.vt = VT_VARIANT;
+	hResult = pDispScript->Invoke(dispid,
+		IID_NULL, LOCALE_USER_DEFAULT,
+		DISPATCH_METHOD,
+		&dispParams,
+		&varResult,
+		0,
+		0);
+	pDispScript->Release();
+	m_str_tmp = varResult.bstrVal;
+	return 1;
 }

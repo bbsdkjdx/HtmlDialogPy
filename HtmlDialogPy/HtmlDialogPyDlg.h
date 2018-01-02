@@ -18,8 +18,6 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
-	HRESULT OnButtonOK(IHTMLElement *pElement);
-	HRESULT OnButtonCancel(IHTMLElement *pElement);
 
 // 实现
 protected:
@@ -39,4 +37,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE ShowContextMenu(DWORD dwID, POINT *ppt, IUnknown *pcmdtReserved, IDispatch *pdispReserved);
 	STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID *pguidCmdGroup, DWORD nCmdID);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	CString m_str_tmp;
+protected:
+	afx_msg LRESULT OnCallJs(WPARAM wParam, LPARAM lParam);
 };
