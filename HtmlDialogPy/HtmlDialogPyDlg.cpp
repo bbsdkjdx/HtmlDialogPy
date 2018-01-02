@@ -60,21 +60,15 @@ BEGIN_DISPATCH_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 END_DISPATCH_MAP()
 
 
-CHtmlDialogPyDlg *gpdlg = nullptr;
-
-
-void test()
-{
-
-}
+CHtmlDialogPyDlg *gpHtmlDialogPyDlg = nullptr;
 
 
 WCHAR *call_js(WCHAR *para)
 {
-	if (!gpdlg)return false;
-	gpdlg->m_str_tmp = para;
-	gpdlg->SendMessage(WM_CALL_JS);
-	return gpdlg->m_str_tmp.GetBuffer();
+	if (!gpHtmlDialogPyDlg)return false;
+	gpHtmlDialogPyDlg->m_str_tmp = para;
+	gpHtmlDialogPyDlg->SendMessage(WM_CALL_JS);
+	return gpHtmlDialogPyDlg->m_str_tmp.GetBuffer();
 }
 
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
@@ -82,7 +76,7 @@ CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 	, m_str_tmp(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	gpdlg = this;
+	gpHtmlDialogPyDlg = this;
 	EnableAutomation();
 	SetExternalDispatch(GetIDispatch(TRUE));
 }
