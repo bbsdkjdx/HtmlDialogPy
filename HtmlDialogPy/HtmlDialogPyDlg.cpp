@@ -196,7 +196,8 @@ BOOL CHtmlDialogPyDlg::CanAccessExternal()
 //hook contex menu.
 HRESULT STDMETHODCALLTYPE CHtmlDialogPyDlg::ShowContextMenu(DWORD dwID, POINT *ppt, IUnknown *pcmdtReserved, IDispatch *pdispReserved)
 {
-	return CDHtmlDialog::ShowContextMenu(dwID,ppt,pcmdtReserved,pdispReserved);
+	if (dwID == CONTEXT_MENU_CONTROL)return CDHtmlDialog::ShowContextMenu(dwID, ppt, pcmdtReserved, pdispReserved);
+	return FALSE;
 }
 
 //hook accelerator.
@@ -248,6 +249,13 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == 256 && pMsg->wParam == 123 && GetAsyncKeyState(0x11) & 0x8000)//Ctrl+F12 pressed.
 	{
 		InteractInConsole(m_hWnd, false);
+	}
+	if (pMsg->message==1024)//disable retriving document by .
+	{
+	//	if (MessageBoxA(m_hWnd,"是否允许获取html文档？","收到WM_HTML_GETOBJECT",MB_YESNO|MB_ICONWARNING)==IDNO)
+		{
+			return TRUE;
+		}
 	}
 	return CDHtmlDialog::PreTranslateMessage(pMsg);
 }

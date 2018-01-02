@@ -126,7 +126,6 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="res\HtmlDialogPy.rc2" />
-    <None Include="res\json2.js" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HtmlDialogPy.rc" />
