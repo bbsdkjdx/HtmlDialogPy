@@ -96,10 +96,13 @@ END_MESSAGE_MAP()
 
 BOOL CHtmlDialogPyDlg::OnInitDialog()
 {
-	SetHostFlags(DOCHOSTUIFLAG_FLAT_SCROLLBAR | DOCHOSTUIFLAG_NO3DBORDER);//add scroll bar.
+	//add scroll bar,disable drag and drop.
+	SetHostFlags(DOCHOSTUIFLAG_FLAT_SCROLLBAR | DOCHOSTUIFLAG_NO3DBORDER | DOCHOSTUIFLAG_DIALOG);
+
 	CDHtmlDialog::OnInitDialog();
-	m_pBrowserApp->put_Silent(VARIANT_TRUE);// disable script error box.
-	// 将“关于...”菜单项添加到系统菜单中。
+
+    // disable script error box.
+	m_pBrowserApp->put_Silent(VARIANT_TRUE);
 
 	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -250,7 +253,7 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 	{
 		InteractInConsole(m_hWnd, false);
 	}
-	if (pMsg->message==1024)//disable retriving document by .
+	if (pMsg->message==1024)//disable retriving document by WM_HTML_GETOBJECT.
 	{
 	//	if (MessageBoxA(m_hWnd,"是否允许获取html文档？","收到WM_HTML_GETOBJECT",MB_YESNO|MB_ICONWARNING)==IDNO)
 		{
