@@ -20,3 +20,4 @@
 /HtmlDialogPy/Release/HtmlDialogPy.obj
 /HtmlDialogPy/Release/python_support.obj
 /ipch/htmldialogpy-c56d1b03/htmldialogpy-9c0b7874.ipch
+*.ipch
