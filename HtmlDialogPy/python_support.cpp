@@ -45,7 +45,7 @@ char *pre_code =
 //treate js call exe,use stack[0] as para.
 "def _js_fun():\n"
 "    try:\n"
-"        name,para=_json.loads(stack[0])\n"
+"        name,*para=_json.loads(stack[0])\n"
 "        fun=eval(name)\n"
 "        return _json.dumps(fun(*para))\n"
 "    except Exception as exp:\n"
