@@ -16,15 +16,13 @@
 
  <body id=CHtmlDialogPyDlg topmargin='0' leftmargin='0' ">
          <script>
-             function display(para) {
-                 for (x = 0; x < para.length; ++x) alert(para[x]);
-                 return 'ok.'
-             }
+             function test(para){ return para*2}
              function fun(para) { return frm1.t1.value; }
              function frm_load(url) { document.getElementById('frm1').src = url; }
          </script>
      <button onclick="document.getElementById('frm1').src = 'c:\\a.html'">Page A</button>
      <button onclick="document.getElementById('frm1').src = 'c:\\b.html'">Page B</button>
+     <button onclick="alert(ExtFun('eval',['10**100']))">test python function</button>
          <iframe id="frm1" frameborder="0" height="100%" width="100%" src="c:\\a.html" ExtFun="ExtFun"></iframe>
      </body>
 </HTML>    
