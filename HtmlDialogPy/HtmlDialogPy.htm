@@ -4,7 +4,7 @@
     //js call exe function
     function ExtFun(name, para) { s1 = JSON.stringify([name, para]); ret = external.ext_fun(s1); return JSON.parse(ret); }
     //exe call js function
-    function CallJs(s){try{data = JSON.parse(s);fun=eval(data[0]);para = data[1];return JSON.stringify( fun(para) );}catch (err){return JSON.stringify(err.message);}}
+    function CallJs(s) { try { data = JSON.parse(s); fun = eval(data[0]); para = data[1]; ret = JSON.stringify(fun(para)); if (ret ==null) { ret = 'null'; } return ret; } catch (err) { return JSON.stringify(err.message); } }
 </script>
 
 
@@ -29,43 +29,27 @@
             font-size: 50px;
         }
     </style>
+
 <body id=CHtmlDialogPyDlg bgcolor=LIGHTGREY style="font-family:MS Shell Dlg;font-size:9">
     <table width=100% height=100%>
-        <tr width=100% height=45%>
-            <td align=CENTER valign=BOTTOM>
-                TODO:  在此放置控件。
-            </td>
-        </tr>
         <tr width=100% height=100%>
-            <td align=RIGHT valign=BOTTOM>
-                <input id="Button1" type="button" value="Button1" name="Button1" onclick="alert(ExtFun('add',get_para()));">
+                First name:<br>
+                <input type="number" id="idfn" name="firstname">
+                <br>
+                Last name:<br>
+                <input type="number" id="idln" name="lastname">
+
+                <input id="Button1" type="button" value="Button1" name="Button1" onclick="alert(ExtFun('add',[idfn.value,idln.value]));">
                 <input id="Button2" type="button" value="Button2" name="Button2" onclick="display([1,2,3]);">
-
                 <script>
-
                     function display(para) {
-                        
                         for (x = 0; x < para.length;++x) alert(para[x]);
                         return 'ok.'
                     }
-                    function get_para() {
-                        fn = document.getElementById('idfn').value
-                        ln = document.getElementById('idln').value
-                        return [parseInt(fn),parseInt(ln)]
-                    }
-                    
-                </script>
-                
-
-                <form>
-                    First name:<br>
-                    <input type="text" id="idfn" name="firstname">
-                    <br>
-                    Last name:<br>
-                    <input type="text" id="idln" name="lastname">
-                </form> 
-            </td>
+                    function fun( para) { frm1.fun(); }
+                </script>      
         </tr>
+        <iframe id="frm1" src="c:\\a.html"></iframe>
     </table>
 </body>
 </HTML>    
