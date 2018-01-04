@@ -4,11 +4,9 @@
     //js call exe function. ExtFun(name,paras...)
     function ExtFun() { arguments = Array.prototype.slice.call(arguments); s1 = JSON.stringify(arguments); ret = external.ext_fun(s1); return JSON.parse(ret); }
     //exe call js function
-    function CallJs(s) {try { data = JSON.parse(s); __fun = eval(data[0]); para = data[1]; ret = JSON.stringify(__fun(para)); if (ret ==null) { ret = 'null'; } return ret; } catch (err) { return JSON.stringify(err.message); } }
+    function CallJs(s) { try { data = JSON.parse(s); __tmp_fun__ = eval(data[0]); para = data[1]; ret = JSON.stringify(__tmp_fun__(para)); if (ret == null) { ret = 'null'; } return ret; } catch (err) { return JSON.stringify(err.message); } }
 
     //iframe call ExtFun£º window.parent.ExtFun();
-
-
 </script>
 
  <HTML>
@@ -19,8 +17,7 @@
  <body id='CHtmlDialogPyDlg' topmargin='0' leftmargin='0' >
 
          <script>
-
-             function fun() { document.getElementById('frm1').t1.value; }
+             function test() { return ifr.contentWindow.test(); }
 
              function fill_ifr(txt) {
                  var ifrdoc = ifr.contentWindow.document;
@@ -34,8 +31,8 @@
              ifr.name = 'frm1';
              ifr.width = '100%';
              ifr.height = '100%';
-             ifr.marginHeight = 0;
-             ifr.marginWidth = 0;
+             //ifr.marginHeight = 0;
+             //ifr.marginWidth = 0;
              document.body.appendChild(ifr);
         </script>
 
