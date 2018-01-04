@@ -19,11 +19,14 @@
          <script>
              function test() { return ifr.contentWindow.test(); }
 
-             function fill_ifr(txt) {
+             function set_html(txt) {
                  var ifrdoc = ifr.contentWindow.document;
                  ifrdoc.open();
                  ifrdoc.write(txt);
                  ifrdoc.close();
+             }
+             function set_url(txt) {
+                 ifr.src=txt
              }
 
              var ifr = document.createElement("iframe");
