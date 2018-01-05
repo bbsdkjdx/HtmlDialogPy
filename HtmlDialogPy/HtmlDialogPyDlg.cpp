@@ -71,6 +71,23 @@ WCHAR *__call_js(WCHAR *para)
 	return gpHtmlDialogPyDlg->m_str_tmp.GetBuffer();
 }
 
+void set_title(WCHAR *s)
+{
+	if (gpHtmlDialogPyDlg)
+	{
+		gpHtmlDialogPyDlg->SetWindowTextW(s);
+	}
+}
+
+void set_size(int w, int h)
+{
+	if (gpHtmlDialogPyDlg)
+	{
+		gpHtmlDialogPyDlg->SetWindowPos(0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);
+	}
+}
+
+
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
 , m_str_tmp(_T(""))
@@ -129,6 +146,9 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化代码
 	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
+	REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
+	REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
