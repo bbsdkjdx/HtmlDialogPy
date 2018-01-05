@@ -40,4 +40,8 @@ public:
 	CString m_str_tmp;
 protected:
 	afx_msg LRESULT OnCallJs(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg LRESULT OnNcHitTest(CPoint point);
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	bool m_fixed_size;
 };

@@ -87,10 +87,18 @@ void set_size(int w, int h)
 	}
 }
 
+void fixed_size(bool fixed)
+{
+	if (gpHtmlDialogPyDlg)
+	{
+		gpHtmlDialogPyDlg->m_fixed_size = fixed;
+	}
+}
 
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
 , m_str_tmp(_T(""))
+, m_fixed_size(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpHtmlDialogPyDlg = this;
@@ -106,6 +114,7 @@ void CHtmlDialogPyDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	ON_WM_SYSCOMMAND()
 	ON_MESSAGE(WM_CALL_JS, &CHtmlDialogPyDlg::OnCallJs)
+	ON_WM_NCHITTEST()
 END_MESSAGE_MAP()
 
 
@@ -148,6 +157,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
 	REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
 	REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
+	REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
 
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -330,4 +340,27 @@ afx_msg LRESULT CHtmlDialogPyDlg::OnCallJs(WPARAM wParam, LPARAM lParam)
 	pDispScript->Release();
 	m_str_tmp = varResult.bstrVal;
 	return 1;
+}
+
+
+LRESULT CHtmlDialogPyDlg::OnNcHitTest(CPoint point)
+{
+	// TODO:  在此添加消息处理程序代码和/或调用默认值
+	int ret = CDHtmlDialog::OnNcHitTest(point);
+
+	//if语句的前两行是用来禁止改变大小的，最后一行是用来禁止移动的
+	if ( m_fixed_size && (HTTOP == ret || HTBOTTOM == ret || HTLEFT == ret || HTRIGHT == ret
+		                  || HTBOTTOMLEFT == ret || HTBOTTOMRIGHT == ret || HTTOPLEFT == ret
+						  || HTTOPRIGHT == ret || HTCAPTION == ret)
+       )
+	return HTCLIENT;
+	return ret;
+}
+
+
+LRESULT CHtmlDialogPyDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO:  在此添加专用代码和/或调用基类
+	if (m_fixed_size && wParam == SC_MAXIMIZE) return 0;
+	return CDHtmlDialog::WindowProc(message, wParam, lParam);
 }
