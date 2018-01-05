@@ -58,10 +58,12 @@ char *pre_code =
 "    return _json.loads(s2)\n"
 
 "class CJs(object):\n"
-"    def _proxy_fun(self, name, *args):\n"
-"        return _call_js(name,args)\n"
+"    def __init__(self, name = None):\n"
+"        self.name = name if name else[]\n"
 "    def __getattr__(self, name):\n"
-"        return lambda *args : self._proxy_fun(name, *args)\n"
+"        return CJs(self.name + [name])\n"
+"    def __call__(self, *args):\n"
+"        return _call_js('.'.join(self.name),args)\n"
 "js=CJs()"
 ;
 
