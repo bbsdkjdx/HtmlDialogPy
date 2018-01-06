@@ -202,10 +202,9 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	// TODO:  在此添加额外的初始化代码
 
 	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
-	REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
-	REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
-	REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
-
+		REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
+		REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
+		REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
