@@ -13,7 +13,7 @@ char *pre_code =
 "import json as _json\n"
 
 //stack to transform parameters between exe and python.
-"stack=[0]*50\n"
+"stack=dict\n"
 
 //show message box before foreground window.
 "def msgbox(s,title=''):\n"
