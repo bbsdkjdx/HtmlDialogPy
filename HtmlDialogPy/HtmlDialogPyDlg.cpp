@@ -46,6 +46,51 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
+class CJsCaller
+{
+public:
+	CJsCaller(CHtmlDialogPyDlg *pdlg)
+	{
+		pdlg->GetDHtmlDocument(&m_pdoc);
+		m_pdoc->get_Script(&m_pDispScript);
+
+		CComBSTR objbstrValue = _T("CallJs");
+		BSTR bstrValue = objbstrValue.Copy();
+		OLECHAR *pszFunct = bstrValue;
+
+		m_pDispScript->GetIDsOfNames(IID_NULL,&pszFunct,1,LOCALE_SYSTEM_DEFAULT,&m_dispid);
+		m_dispParams.cArgs = 1;
+		m_dispParams.cNamedArgs = 0;
+		m_dispParams.rgdispidNamedArgs = NULL;
+		m_dispParams.rgvarg = &m_var;
+		m_dispParams.rgvarg[0].vt = VT_BSTR;
+		m_varResult.vt = VT_VARIANT;
+	}
+	WCHAR *CallJs(WCHAR *json_str)
+	{
+		m_dispParams.rgvarg[0].bstrVal = CComBSTR(json_str);
+		m_pDispScript->Invoke(m_dispid,
+			IID_NULL, LOCALE_USER_DEFAULT,
+			DISPATCH_METHOD,
+			&m_dispParams,
+			&m_varResult,
+			0,
+			0);
+		return m_varResult.bstrVal;
+	}
+	~CJsCaller()
+	{
+		m_pDispScript->Release();
+	}
+
+private:
+	IHTMLDocument2* m_pdoc;
+	VARIANT m_varResult;
+	IDispatch *m_pDispScript;
+	DISPID   m_dispid;
+	DISPPARAMS m_dispParams;
+	VARIANTARG m_var;
+};
 
 // CHtmlDialogPyDlg 对话框
 
@@ -99,6 +144,7 @@ CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
 , m_str_tmp(_T(""))
 , m_fixed_size(false)
+, m_p_js_caller(nullptr)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpHtmlDialogPyDlg = this;
@@ -154,6 +200,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
+
 	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
 	REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
 	REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
@@ -296,49 +343,8 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 
 afx_msg LRESULT CHtmlDialogPyDlg::OnCallJs(WPARAM wParam, LPARAM lParam)
 {
-	IHTMLDocument2* pDoc2 = NULL;
-	VARIANT varResult;
-	CDHtmlDialog::GetDHtmlDocument(&pDoc2);
-	IDispatch *pDispScript = NULL;
-	HRESULT hResult;
-	hResult = pDoc2->get_Script(&pDispScript);
-	if (FAILED(hResult))
-	{
-		return 0;
-	}
-
-	DISPID   dispid;
-	CComBSTR objbstrValue = _T("CallJs");
-	BSTR bstrValue = objbstrValue.Copy();
-	OLECHAR *pszFunct = bstrValue;
-	hResult = pDispScript->GetIDsOfNames(IID_NULL,
-		&pszFunct,
-		1,
-		LOCALE_SYSTEM_DEFAULT,
-		&dispid);
-	if (FAILED(hResult))
-	{
-		pDispScript->Release();
-		return 0;
-	}
-	DISPPARAMS dispParams;
-	VARIANTARG var;
-	dispParams.cArgs = 1;
-	dispParams.cNamedArgs = 0;
-	dispParams.rgdispidNamedArgs = NULL;
-	dispParams.rgvarg = &var;
-	dispParams.rgvarg[0].vt = VT_BSTR;
-	dispParams.rgvarg[0].bstrVal = CComBSTR(m_str_tmp.GetBuffer());
-	varResult.vt = VT_VARIANT;
-	hResult = pDispScript->Invoke(dispid,
-		IID_NULL, LOCALE_USER_DEFAULT,
-		DISPATCH_METHOD,
-		&dispParams,
-		&varResult,
-		0,
-		0);
-	pDispScript->Release();
-	m_str_tmp = varResult.bstrVal;
+	if(!m_p_js_caller)m_p_js_caller = new CJsCaller(this);
+	m_str_tmp = m_p_js_caller->CallJs(m_str_tmp.GetBuffer());
 	return 1;
 }
 

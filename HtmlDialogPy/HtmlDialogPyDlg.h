@@ -6,6 +6,8 @@
 
 
 // CHtmlDialogPyDlg 对话框
+class CJsCaller;
+
 class CHtmlDialogPyDlg : public CDHtmlDialog
 {
 // 构造
@@ -22,7 +24,7 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
-
+	CJsCaller *m_p_js_caller;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
