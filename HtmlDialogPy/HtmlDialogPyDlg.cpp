@@ -107,6 +107,10 @@ END_DISPATCH_MAP()
 
 CHtmlDialogPyDlg *gpHtmlDialogPyDlg = nullptr;
 
+//functions export to python./////////////////////////////////////////////////////////////////////////////
+void set_title(WCHAR *s) { if (gpHtmlDialogPyDlg)gpHtmlDialogPyDlg->SetWindowTextW(s); }
+void set_size(int w, int h) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->SetWindowPos(0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER); }
+void fixed_size(bool fixed) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->m_fixed_size = fixed; }
 
 WCHAR *__call_js(WCHAR *para)
 {
@@ -116,30 +120,20 @@ WCHAR *__call_js(WCHAR *para)
 	return gpHtmlDialogPyDlg->m_str_tmp.GetBuffer();
 }
 
-void set_title(WCHAR *s)
+UINT get_browser_hwnd()
 {
 	if (gpHtmlDialogPyDlg)
 	{
-		gpHtmlDialogPyDlg->SetWindowTextW(s);
+		HWND wnd = gpHtmlDialogPyDlg->m_hWnd;
+		wnd=::FindWindowEx(wnd, 0, 0, 0);
+		wnd = ::FindWindowEx(wnd, 0, 0, 0);
+		wnd = ::FindWindowEx(wnd, 0, 0, 0);
+		return UINT(wnd);
 	}
+	return 0;
 }
 
-void set_size(int w, int h)
-{
-	if (gpHtmlDialogPyDlg)
-	{
-		gpHtmlDialogPyDlg->SetWindowPos(0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);
-	}
-}
-
-void fixed_size(bool fixed)
-{
-	if (gpHtmlDialogPyDlg)
-	{
-		gpHtmlDialogPyDlg->m_fixed_size = fixed;
-	}
-}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
 , m_str_tmp(_T(""))
@@ -205,6 +199,8 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 		REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
 		REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
 		REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
+		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "")
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -333,7 +329,7 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 	{
 		//	if (MessageBoxA(m_hWnd,"是否允许获取html文档？","收到WM_HTML_GETOBJECT",MB_YESNO|MB_ICONWARNING)==IDNO)
 		{
-			return TRUE;
+			//return TRUE;
 		}
 	}
 	return CDHtmlDialog::PreTranslateMessage(pMsg);

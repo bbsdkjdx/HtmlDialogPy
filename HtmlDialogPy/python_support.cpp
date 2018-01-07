@@ -51,10 +51,19 @@ char *pre_code =
 "    except Exception as exp:\n"
 "        return _json.dumps(str(exp))\n"
 
-//treat exe call js. via exe.__call_js(),if exe function changed,you should change codes below.
+//treat exe call js.
 "def _call_js(fun_name,paras):\n"
 "    s1=_json.dumps([fun_name,paras])\n"
-"    s2=exe.__call_js(s1)\n"
+"    if len(s1)<1000:\n"//short parameters use exe.__call_js
+"        s2=exe.__call_js(s1)\n"
+"        return _json.loads(s2)\n"
+"    import htmldoc\n"//long parameters use 'jscaller' in html.
+"    wnd=exe.maindlg.get_browser_hwnd()\n"
+"    _html_document=htmldoc.wnd2htmldoc(wnd)\n"
+"    _js_caller=_html_document.getElementById('jscaller')\n"
+"    _js_caller.value=s1\n"
+"    _js_caller.click()\n"
+"    s2=_js_caller.value\n"
 "    return _json.loads(s2)\n"
 
 "class CJs(object):\n"
@@ -64,7 +73,8 @@ char *pre_code =
 "        return CJs(self.name + [name])\n"
 "    def __call__(self, *args):\n"
 "        return _call_js('.'.join(self.name),args)\n"
-"js=CJs()"
+"js=CJs()\n"
+
 ;
 
 
