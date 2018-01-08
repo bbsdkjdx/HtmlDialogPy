@@ -6,7 +6,6 @@
 
 
 // CHtmlDialogPyDlg 对话框
-class CJsCaller;
 
 class CHtmlDialogPyDlg : public CDHtmlDialog
 {
@@ -24,7 +23,6 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
-	CJsCaller *m_p_js_caller;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -39,9 +37,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE ShowContextMenu(DWORD dwID, POINT *ppt, IUnknown *pcmdtReserved, IDispatch *pdispReserved);
 	STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID *pguidCmdGroup, DWORD nCmdID);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CString m_str_tmp;
-protected:
-	afx_msg LRESULT OnCallJs(WPARAM wParam, LPARAM lParam);
+
 public:
 	afx_msg LRESULT OnNcHitTest(CPoint point);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);

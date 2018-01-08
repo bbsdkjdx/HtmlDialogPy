@@ -45,53 +45,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-
-class CJsCaller
-{
-public:
-	CJsCaller(CHtmlDialogPyDlg *pdlg)
-	{
-		pdlg->GetDHtmlDocument(&m_pdoc);
-		m_pdoc->get_Script(&m_pDispScript);
-
-		CComBSTR objbstrValue = _T("CallJs");
-		BSTR bstrValue = objbstrValue.Copy();
-		OLECHAR *pszFunct = bstrValue;
-
-		m_pDispScript->GetIDsOfNames(IID_NULL,&pszFunct,1,LOCALE_SYSTEM_DEFAULT,&m_dispid);
-		m_dispParams.cArgs = 1;
-		m_dispParams.cNamedArgs = 0;
-		m_dispParams.rgdispidNamedArgs = NULL;
-		m_dispParams.rgvarg = &m_var;
-		m_dispParams.rgvarg[0].vt = VT_BSTR;
-		m_varResult.vt = VT_VARIANT;
-	}
-	WCHAR *CallJs(WCHAR *json_str)
-	{
-		m_dispParams.rgvarg[0].bstrVal = CComBSTR(json_str);
-		m_pDispScript->Invoke(m_dispid,
-			IID_NULL, LOCALE_USER_DEFAULT,
-			DISPATCH_METHOD,
-			&m_dispParams,
-			&m_varResult,
-			0,
-			0);
-		return m_varResult.bstrVal;
-	}
-	~CJsCaller()
-	{
-		m_pDispScript->Release();
-	}
-
-private:
-	IHTMLDocument2* m_pdoc;
-	VARIANT m_varResult;
-	IDispatch *m_pDispScript;
-	DISPID   m_dispid;
-	DISPPARAMS m_dispParams;
-	VARIANTARG m_var;
-};
-
 // CHtmlDialogPyDlg 对话框
 
 BEGIN_DHTML_EVENT_MAP(CHtmlDialogPyDlg)
@@ -112,23 +65,17 @@ void set_title(WCHAR *s) { if (gpHtmlDialogPyDlg)gpHtmlDialogPyDlg->SetWindowTex
 void set_size(int w, int h) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->SetWindowPos(0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER); }
 void fixed_size(bool fixed) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->m_fixed_size = fixed; }
 
-WCHAR *__call_js(WCHAR *para)
-{
-	if (!gpHtmlDialogPyDlg)return false;
-	gpHtmlDialogPyDlg->m_str_tmp = para;
-	gpHtmlDialogPyDlg->SendMessage(WM_CALL_JS);
-	return gpHtmlDialogPyDlg->m_str_tmp.GetBuffer();
-}
 
 UINT get_browser_hwnd()
 {
 	if (gpHtmlDialogPyDlg)
 	{
-		HWND wnd = gpHtmlDialogPyDlg->m_hWnd;
-		wnd=::FindWindowEx(wnd, 0, 0, 0);
-		wnd = ::FindWindowEx(wnd, 0, 0, 0);
-		wnd = ::FindWindowEx(wnd, 0, 0, 0);
-		return UINT(wnd);
+		HWND ret = 0;
+		for (HWND wnd = gpHtmlDialogPyDlg->m_hWnd; wnd; wnd = ::FindWindowEx(wnd, 0, 0, 0))
+		{
+			ret = wnd;
+		}
+		return UINT(ret);
 	}
 	return 0;
 }
@@ -136,9 +83,7 @@ UINT get_browser_hwnd()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
-, m_str_tmp(_T(""))
 , m_fixed_size(false)
-, m_p_js_caller(nullptr)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpHtmlDialogPyDlg = this;
@@ -153,7 +98,6 @@ void CHtmlDialogPyDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	ON_WM_SYSCOMMAND()
-	ON_MESSAGE(WM_CALL_JS, &CHtmlDialogPyDlg::OnCallJs)
 	ON_WM_NCHITTEST()
 END_MESSAGE_MAP()
 
@@ -194,8 +138,6 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
-
-	REG_EXE_FUN("", __call_js, "SS", "used for python call js,do not use it directly.")
 		REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
 		REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
 		REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
@@ -317,15 +259,6 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 	return CDHtmlDialog::PreTranslateMessage(pMsg);
 }
 
-
-afx_msg LRESULT CHtmlDialogPyDlg::OnCallJs(WPARAM wParam, LPARAM lParam)
-{
-	if(!m_p_js_caller)m_p_js_caller = new CJsCaller(this);
-	m_str_tmp = m_p_js_caller->CallJs(m_str_tmp.GetBuffer());
-	return 1;
-}
-
-
 LRESULT CHtmlDialogPyDlg::OnNcHitTest(CPoint point)
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
@@ -335,8 +268,7 @@ LRESULT CHtmlDialogPyDlg::OnNcHitTest(CPoint point)
 	if ( m_fixed_size && (HTTOP == ret || HTBOTTOM == ret || HTLEFT == ret || HTRIGHT == ret
 		                  || HTBOTTOMLEFT == ret || HTBOTTOMRIGHT == ret || HTTOPLEFT == ret
 						  || HTTOPRIGHT == ret || HTCAPTION == ret)
-       )
-	return HTCLIENT;
+       )return HTCLIENT;
 	return ret;
 }
 

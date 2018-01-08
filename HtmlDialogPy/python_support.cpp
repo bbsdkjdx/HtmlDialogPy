@@ -11,6 +11,7 @@ char *pre_code =
 "import traceback as _traceback\n"
 "import ctypes as _ctypes\n"
 "import json as _json\n"
+"from threading import get_ident as _get_thd_id\n"
 
 //stack to transform parameters between exe and python.
 "stack=dict()\n"
@@ -42,12 +43,24 @@ char *pre_code =
 "    exe.__dict__[mod].__dict__[fnn] = eval(cmd)\n"
 "    exe.__dict__[mod].__dict__[fnn].__doc__=doc\n"
 
+
+
+"_thd_dict=dict()\n"
+//two caller in html to call back and forth.
+"def get_caller():\n"
+"    import htmldoc\n"
+"    wnd=exe.maindlg.get_browser_hwnd()\n"
+"    doc=htmldoc.wnd2htmldoc(wnd)\n"
+"    dic=dict()\n"
+"    dic['_exe_caller']=doc.getElementById('execaller')\n"
+"    dic['_js_caller']=doc.getElementById('jscaller')\n"
+"    _thd_dict[_get_thd_id()]=dic\n"
+
 //treate js call exe,
 "def _js_fun():\n"
-"    import htmldoc\n"//long parameters use 'jscaller' in html.
-"    wnd=exe.maindlg.get_browser_hwnd()\n"
-"    _html_document=htmldoc.wnd2htmldoc(wnd)\n"
-"    _exe_caller=_html_document.getElementById('execaller')\n"
+"    if _get_thd_id() not in _thd_dict:\n"
+"        get_caller()\n"
+"    _exe_caller=_thd_dict[_get_thd_id()]['_exe_caller']\n"
 "    fun,*para=_json.loads(_exe_caller.value)\n"
 "    try:\n"
 "        fun=eval(fun)\n"
@@ -59,18 +72,14 @@ char *pre_code =
 //treat exe call js.
 "def _call_js(fun_name,paras):\n"
 "    s1=_json.dumps([fun_name,paras])\n"
-"    if len(s1)<1000:\n"//short parameters use exe.__call_js
-"        s2=exe.__call_js(s1)\n"
-"        return _json.loads(s2)\n"
-"    import htmldoc\n"//long parameters use 'jscaller' in html.
-"    wnd=exe.maindlg.get_browser_hwnd()\n"
-"    _html_document=htmldoc.wnd2htmldoc(wnd)\n"
-"    _js_caller=_html_document.getElementById('jscaller')\n"
+"    if _get_thd_id() not in _thd_dict:\n"
+"        get_caller()\n"
+"    _js_caller=_thd_dict[_get_thd_id()]['_js_caller']\n"
 "    _js_caller.value=s1\n"
 "    _js_caller.click()\n"
 "    s2=_js_caller.value\n"
 "    return _json.loads(s2)\n"
-
+//the wrapper of exe call js.
 "class CJs(object):\n"
 "    def __init__(self, name = None):\n"
 "        self.name = name if name else[]\n"
@@ -79,6 +88,7 @@ char *pre_code =
 "    def __call__(self, *args):\n"
 "        return _call_js('.'.join(self.name),args)\n"
 "js=CJs()\n"
+
 ;
 
 

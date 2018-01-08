@@ -4,7 +4,6 @@
 // 特定于项目的包含文件
 
 #pragma once
-const int WM_CALL_JS = 12345;
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // 从 Windows 头中排除极少使用的资料
 #endif
