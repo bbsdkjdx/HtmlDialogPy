@@ -101,7 +101,7 @@ END_DHTML_EVENT_MAP()
 
 
 BEGIN_DISPATCH_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
-	DISP_FUNCTION(CHtmlDialogPyDlg, "ext_fun", ext_fun, VT_BSTR, VTS_BSTR)
+	DISP_FUNCTION(CHtmlDialogPyDlg, "ext_fun", ext_fun, VT_NULL, VTS_NONE)
 END_DISPATCH_MAP()
 
 
@@ -201,7 +201,10 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 		REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
 		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "")
 
-
+	if (!PyExecA("import autorun"))
+	{
+		AfxMessageBox(PyGetStr());
+	}
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -254,12 +257,9 @@ HCURSOR CHtmlDialogPyDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-WCHAR* CHtmlDialogPyDlg::ext_fun(wchar_t* para)
+void CHtmlDialogPyDlg::ext_fun()
 {
-	PySetStrW(para, 0);
-	PyEvalA("_js_fun()");
-	return CComBSTR(PyGetStr());
+	PyExecA("_js_fun()");
 }
 
 //disable safe warning.
@@ -289,7 +289,6 @@ HRESULT STDMETHODCALLTYPE CHtmlDialogPyDlg::TranslateAccelerator(LPMSG lpMsg,
 		{
 			return S_OK;
 		}
-
 
 		// prevent F5,escape,return,backspace.
 		if (wp == VK_F5 || wp==VK_ESCAPE || wp==VK_RETURN || wp==VK_BACK)

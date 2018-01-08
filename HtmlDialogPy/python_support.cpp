@@ -42,14 +42,19 @@ char *pre_code =
 "    exe.__dict__[mod].__dict__[fnn] = eval(cmd)\n"
 "    exe.__dict__[mod].__dict__[fnn].__doc__=doc\n"
 
-//treate js call exe,use stack[0] as para.
+//treate js call exe,
 "def _js_fun():\n"
+"    import htmldoc\n"//long parameters use 'jscaller' in html.
+"    wnd=exe.maindlg.get_browser_hwnd()\n"
+"    _html_document=htmldoc.wnd2htmldoc(wnd)\n"
+"    _exe_caller=_html_document.getElementById('execaller')\n"
+"    fun,*para=_json.loads(_exe_caller.value)\n"
 "    try:\n"
-"        name,*para=_json.loads(stack[0])\n"
-"        fun=eval(name)\n"
-"        return _json.dumps(fun(*para))\n"
+"        fun=eval(fun)\n"
+"        _exe_caller.value= fun(*para)\n"
 "    except Exception as exp:\n"
-"        return _json.dumps(str(exp))\n"
+"        _exe_caller.value= str(exp)\n"
+
 
 //treat exe call js.
 "def _call_js(fun_name,paras):\n"
@@ -74,7 +79,6 @@ char *pre_code =
 "    def __call__(self, *args):\n"
 "        return _call_js('.'.join(self.name),args)\n"
 "js=CJs()\n"
-
 ;
 
 
@@ -265,6 +269,7 @@ void _InteractInConsole(void *para)
 {
 	CGIL gil;
 	HWND hwn = ::GetConsoleWindow();
+	CoInitializeEx(0, 0);
 	if (!hwn)
 	{
 		AllocConsole();
