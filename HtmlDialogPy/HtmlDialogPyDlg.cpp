@@ -283,33 +283,16 @@ HRESULT STDMETHODCALLTYPE CHtmlDialogPyDlg::TranslateAccelerator(LPMSG lpMsg,
 	if (lpMsg && lpMsg->message == WM_KEYDOWN)
 	{
 		bool bCtrl = (0x80 == (0x80 & GetKeyState(VK_CONTROL)));
-
-		// prevent Ctrl+N
-		if (lpMsg->wParam == 'N' && bCtrl)
+		WPARAM wp = lpMsg->wParam;
+		// prevent Ctrl+N,F
+		if (bCtrl && (wp=='N' || wp=='F') )
 		{
 			return S_OK;
 		}
 
-		// prevent Ctrl+F
-		if (lpMsg->wParam == 'F' && bCtrl)
-		{
-			return S_OK;
-		}
 
-		// prevent F5
-		if (lpMsg->wParam == VK_F5)
-		{
-			return S_OK;
-		}
-
-		// prevent ESC
-		if (lpMsg->wParam == VK_ESCAPE)
-		{
-			return S_OK;
-		}
-
-		// prevent ENTER
-		if (lpMsg->wParam == VK_RETURN)
+		// prevent F5,escape,return,backspace.
+		if (wp == VK_F5 || wp==VK_ESCAPE || wp==VK_RETURN || wp==VK_BACK)
 		{
 			return S_OK;
 		}
