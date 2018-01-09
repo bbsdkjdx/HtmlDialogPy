@@ -99,6 +99,7 @@ void CHtmlDialogPyDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_NCHITTEST()
+	ON_WM_NCLBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 
@@ -267,7 +268,7 @@ LRESULT CHtmlDialogPyDlg::OnNcHitTest(CPoint point)
 	//if语句的前两行是用来禁止改变大小的，最后一行是用来禁止移动的
 	if ( m_fixed_size && (HTTOP == ret || HTBOTTOM == ret || HTLEFT == ret || HTRIGHT == ret
 		                  || HTBOTTOMLEFT == ret || HTBOTTOMRIGHT == ret || HTTOPLEFT == ret
-						  || HTTOPRIGHT == ret || HTCAPTION == ret)
+						  || HTTOPRIGHT == ret )
        )return HTCLIENT;
 	return ret;
 }
@@ -278,4 +279,12 @@ LRESULT CHtmlDialogPyDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	// TODO:  在此添加专用代码和/或调用基类
 	if (m_fixed_size && wParam == SC_MAXIMIZE) return 0;
 	return CDHtmlDialog::WindowProc(message, wParam, lParam);
+}
+
+
+void CHtmlDialogPyDlg::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
+{
+	// TODO:  在此添加消息处理程序代码和/或调用默认值
+	if (m_fixed_size)return;
+	CDHtmlDialog::OnNcLButtonDblClk(nHitTest, point);
 }
