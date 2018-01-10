@@ -63,7 +63,15 @@ CHtmlDialogPyDlg *gpHtmlDialogPyDlg = nullptr;
 //functions export to python./////////////////////////////////////////////////////////////////////////////
 void set_title(WCHAR *s) { if (gpHtmlDialogPyDlg)gpHtmlDialogPyDlg->SetWindowTextW(s); }
 void set_size(int w, int h) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->SetWindowPos(0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER); }
-void fixed_size(bool fixed) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->m_fixed_size = fixed; }
+
+void fixed_size(int w, int h) 
+{
+	if (gpHtmlDialogPyDlg)
+	{
+		gpHtmlDialogPyDlg->m_fixed_size = { w, h };
+		if(w!=0 && h!=0)gpHtmlDialogPyDlg->SetWindowPos(0,0,0,0,0,SWP_NOMOVE|SWP_NOZORDER); 
+	}
+}
 
 
 UINT get_browser_hwnd()
@@ -83,7 +91,7 @@ UINT get_browser_hwnd()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
-, m_fixed_size(false)
+, m_fixed_size()
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpHtmlDialogPyDlg = this;
@@ -100,6 +108,7 @@ BEGIN_MESSAGE_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_NCHITTEST()
 	ON_WM_NCLBUTTONDBLCLK()
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -141,7 +150,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	// TODO:  在此添加额外的初始化代码
 		REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
 		REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
-		REG_EXE_FUN("maindlg", fixed_size, "#l", "fixed window size")
+		REG_EXE_FUN("maindlg", fixed_size, "#ll", "fixed window size")
 		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "")
 
 	if (!PyExecA("import autorun"))
@@ -260,31 +269,13 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 	return CDHtmlDialog::PreTranslateMessage(pMsg);
 }
 
-LRESULT CHtmlDialogPyDlg::OnNcHitTest(CPoint point)
+void CHtmlDialogPyDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
-	int ret = CDHtmlDialog::OnNcHitTest(point);
-
-	//if语句的前两行是用来禁止改变大小的，最后一行是用来禁止移动的
-	if ( m_fixed_size && (HTTOP == ret || HTBOTTOM == ret || HTLEFT == ret || HTRIGHT == ret
-		                  || HTBOTTOMLEFT == ret || HTBOTTOMRIGHT == ret || HTTOPLEFT == ret
-						  || HTTOPRIGHT == ret )
-       )return HTCLIENT;
-	return ret;
-}
-
-
-LRESULT CHtmlDialogPyDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	// TODO:  在此添加专用代码和/或调用基类
-	if (m_fixed_size && wParam == SC_MAXIMIZE) return 0;
-	return CDHtmlDialog::WindowProc(message, wParam, lParam);
-}
-
-
-void CHtmlDialogPyDlg::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
-{
-	// TODO:  在此添加消息处理程序代码和/或调用默认值
-	if (m_fixed_size)return;
-	CDHtmlDialog::OnNcLButtonDblClk(nHitTest, point);
+	if (m_fixed_size.x!=0 && m_fixed_size.y!=0)
+	{
+		lpMMI->ptMaxTrackSize = m_fixed_size;
+		lpMMI->ptMinTrackSize = m_fixed_size;
+	}
+	CDHtmlDialog::OnGetMinMaxInfo(lpMMI);
 }

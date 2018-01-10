@@ -39,8 +39,6 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
-	afx_msg LRESULT OnNcHitTest(CPoint point);
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	bool m_fixed_size;
-	afx_msg void OnNcLButtonDblClk(UINT nHitTest, CPoint point);
+	POINT m_fixed_size;
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };
