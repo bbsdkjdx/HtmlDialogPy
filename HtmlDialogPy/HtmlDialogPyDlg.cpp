@@ -62,15 +62,24 @@ CHtmlDialogPyDlg *gpHtmlDialogPyDlg = nullptr;
 
 //functions export to python./////////////////////////////////////////////////////////////////////////////
 void set_title(WCHAR *s) { if (gpHtmlDialogPyDlg)gpHtmlDialogPyDlg->SetWindowTextW(s); }
-void set_size(int w, int h) { if (gpHtmlDialogPyDlg) gpHtmlDialogPyDlg->SetWindowPos(0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER); }
 
-void fixed_size(int w, int h) 
+void set_size(int x, int y, int z, bool fixed)
 {
-	if (gpHtmlDialogPyDlg)
+	if (!gpHtmlDialogPyDlg)return;
+
+	if (fixed)
 	{
-		gpHtmlDialogPyDlg->m_fixed_size = { w, h };
-		if(w!=0 && h!=0)gpHtmlDialogPyDlg->SetWindowPos(0,0,0,0,0,SWP_NOMOVE|SWP_NOZORDER); 
+		gpHtmlDialogPyDlg->m_fixed_size = { x, y };
 	}
+	else
+	{
+		gpHtmlDialogPyDlg->m_fixed_size = { 0, 0 };
+	}
+
+	DWORD flag=SWP_NOMOVE;
+	if (z == -1)flag |= SWP_NOZORDER;
+	const CWnd *p_wnd_after = z ? &CWnd::wndTopMost : &CWnd::wndNoTopMost;
+	gpHtmlDialogPyDlg->SetWindowPos(p_wnd_after, 0, 0,x, y,  flag);
 }
 
 
@@ -106,8 +115,6 @@ void CHtmlDialogPyDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CHtmlDialogPyDlg, CDHtmlDialog)
 	ON_WM_SYSCOMMAND()
-	ON_WM_NCHITTEST()
-	ON_WM_NCLBUTTONDBLCLK()
 	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
@@ -148,10 +155,9 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO:  在此添加额外的初始化代码
-		REG_EXE_FUN("maindlg", set_title, "#S", "set window title")
-		REG_EXE_FUN("maindlg", set_size, "#ll", "set window size")
-		REG_EXE_FUN("maindlg", fixed_size, "#ll", "fixed window size")
-		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "")
+	REG_EXE_FUN("maindlg", set_title, "#S", "void set_title(WCHAR *s);\nset window title")
+		REG_EXE_FUN("maindlg", set_size, "#llll", "void set_size(int x, int y, int z, bool fixed);\nz=1 make topmost,z=0 make not topmost,z=-1 keep z order.")
+		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "UINT get_browser_hwnd();\nget the browser hwnd ,for get html document.")
 
 	if (!PyExecA("import autorun"))
 	{
