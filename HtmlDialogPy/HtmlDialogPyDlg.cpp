@@ -123,8 +123,6 @@ END_MESSAGE_MAP()
 
 BOOL CHtmlDialogPyDlg::OnInitDialog()
 {
-	//add scroll bar(DOCHOSTUIFLAG_SCROLL_NO,DOCHOSTUIFLAG_FLAT_SCROLLBAR),disable drag and drop.
-	SetHostFlags(DOCHOSTUIFLAG_SCROLL_NO | DOCHOSTUIFLAG_NO3DBORDER | DOCHOSTUIFLAG_DIALOG);
 
 	CDHtmlDialog::OnInitDialog();
 
@@ -273,6 +271,13 @@ BOOL CHtmlDialogPyDlg::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 	return CDHtmlDialog::PreTranslateMessage(pMsg);
+}
+
+STDMETHODIMP CHtmlDialogPyDlg::GetHostInfo(DOCHOSTUIINFO *pInfo)
+{	
+//add scroll bar(DOCHOSTUIFLAG_SCROLL_NO,DOCHOSTUIFLAG_FLAT_SCROLLBAR),disable drag and drop.
+	pInfo->dwFlags = DOCHOSTUIFLAG_THEME | DOCHOSTUIFLAG_SCROLL_NO | DOCHOSTUIFLAG_NO3DBORDER | DOCHOSTUIFLAG_DIALOG;
+	return S_OK;
 }
 
 void CHtmlDialogPyDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)

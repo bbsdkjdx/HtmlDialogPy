@@ -37,7 +37,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE ShowContextMenu(DWORD dwID, POINT *ppt, IUnknown *pcmdtReserved, IDispatch *pdispReserved);
 	STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID *pguidCmdGroup, DWORD nCmdID);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-
+	STDMETHOD(GetHostInfo)(DOCHOSTUIINFO *pInfo);
 public:
 	POINT m_fixed_size;
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
