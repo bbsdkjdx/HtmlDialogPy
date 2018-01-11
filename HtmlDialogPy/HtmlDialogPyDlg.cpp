@@ -67,6 +67,14 @@ void set_size(int x, int y, int z, bool fixed)
 {
 	if (!gpHtmlDialogPyDlg)return;
 
+	if (x==-1 || y==-1)
+	{
+		CRect rct;
+		gpHtmlDialogPyDlg->GetWindowRect(&rct);
+		x = rct.Width();
+		y = rct.Height();
+	}
+
 	if (fixed)
 	{
 		gpHtmlDialogPyDlg->m_fixed_size = { x, y };
@@ -76,6 +84,7 @@ void set_size(int x, int y, int z, bool fixed)
 		gpHtmlDialogPyDlg->m_fixed_size = { 0, 0 };
 	}
 
+	
 	DWORD flag=SWP_NOMOVE;
 	if (z == -1)flag |= SWP_NOZORDER;
 	const CWnd *p_wnd_after = z ? &CWnd::wndTopMost : &CWnd::wndNoTopMost;
@@ -154,7 +163,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化代码
 	REG_EXE_FUN("maindlg", set_title, "#S", "void set_title(WCHAR *s);\nset window title")
-		REG_EXE_FUN("maindlg", set_size, "#llll", "void set_size(int x, int y, int z, bool fixed);\nz=1 make topmost,z=0 make not topmost,z=-1 keep z order.")
+		REG_EXE_FUN("maindlg", set_size, "#llll", "void set_size(int x, int y, int z, bool fixed);\nif x or y is -1,keep size. if z is -1 keep z-order.")
 		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "UINT get_browser_hwnd();\nget the browser hwnd ,for get html document.")
 
 	if (!PyExecA("import autorun"))
