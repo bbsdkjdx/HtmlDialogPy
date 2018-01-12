@@ -106,10 +106,10 @@ void _init_python()//call it before use other function else.
 	//set current directory.
 	wchar_t szExeFilePathFileName[MAX_PATH];
 	GetModuleFileName(NULL, szExeFilePathFileName, MAX_PATH);
-	CString str = szExeFilePathFileName;
-	str = str.Mid(0, str.ReverseFind(_T('\\')));
-	SetCurrentDirectory(str.GetBuffer());
-
+	int x;
+	for (x = wcslen(szExeFilePathFileName); szExeFilePathFileName[x] != '\\'; --x);
+	szExeFilePathFileName[x] = 0;
+	SetCurrentDirectory(szExeFilePathFileName);
 	pModule = PyImport_ImportModule("__main__");
 	PyEval_SaveThread();
 }
