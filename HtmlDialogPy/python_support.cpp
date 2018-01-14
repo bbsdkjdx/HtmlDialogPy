@@ -57,16 +57,16 @@ char *pre_code =
 "    _thd_dict[_get_thd_id()]=dic\n"
 
 //treate js call exe,
-"def _js_fun():\n"
+"def _ext_fun():\n"
 "    if _get_thd_id() not in _thd_dict:\n"
 "        get_caller()\n"
 "    _exe_caller=_thd_dict[_get_thd_id()]['_exe_caller']\n"
 "    fun,*para=_json.loads(_exe_caller.value)\n"
 "    try:\n"
 "        fun=eval(fun)\n"
-"        _exe_caller.value= fun(*para)\n"
+"        _exe_caller.value= _json.dumps(fun(*para))\n"
 "    except Exception as exp:\n"
-"        _exe_caller.value= str(exp)\n"
+"        _exe_caller.value= _json.dumps(str(exp))\n"
 
 
 //treat exe call js.

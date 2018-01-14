@@ -224,7 +224,7 @@ HCURSOR CHtmlDialogPyDlg::OnQueryDragIcon()
 
 void CHtmlDialogPyDlg::ext_fun()
 {
-	PyExecA("_js_fun()");
+	PyExecA("_ext_fun()");
 }
 
 //disable safe warning.

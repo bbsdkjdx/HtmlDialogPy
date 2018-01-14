@@ -10,3 +10,4 @@ def fun(s):
 	global n
 	__main__.exe.maindlg.set_title(s+str(n))
 	n+=1
+	return [n]+['a']*n
