@@ -137,7 +137,7 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 
 	// disable script error box.
 	m_pBrowserApp->put_Silent(VARIANT_TRUE);
-
+	m_pBrowserApp->put_RegisterAsDropTarget(VARIANT_FALSE);
 	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
