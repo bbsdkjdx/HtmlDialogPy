@@ -1,51 +1,51 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+         .loginInput {
+            border: 1px solid #D2D9dC;
+            border-radius: 2px;
+            color: #444;
+            font: 12px 'Microsoft YaHei', '微软雅黑';
+            padding: 8px 14px;
+            margin-bottom: 8px;
+            width: 310px;
+        }
+        
+         .loginInput:FOCUS {
+            border: 2px solid #B7D4EA;
+        }
+        
+         .loginBtn {
+            background-image: -moz-linear-gradient(to bottom, blue, #85CFEE);
+            border: 1px solid #98CCE7;
 
-<style>
-.btn-group button {
-    background-color: #4CAF50; /* Green background */
-    border: 1px solid green; /* Green border */
-    color: white; /* White text */
-    padding: 10px 24px; /* Some padding */
-    cursor: pointer; /* Pointer/hand icon */
-    float: left; /* Float the buttons side by side */
-}
+            color: #444;
+            /*登录*/
+            cursor: pointer;
+            float: right;
+            font: bold 13px Arial;
+            padding: 10px 50px;
+        }
+        
 
-/* Clear floats (clearfix hack) */
-.btn-group:after {
-    content: "";
-    clear: both;
-    display: table;
-}
+    </style>
+</head>
+<body onsubmit="alert('')">
 
-.btn-group button:not(:last-child) {
-    border-right: none; /* Prevent double borders */
-}
+                    <p><label for="username">用户名：</label></p>
+                    <p><input type="text" id="text" name="text" class="loginInput" autofocus="autofocus" value="" /></p>
 
-/* Add a background color on hover */
-.btn-group button:hover {
-    background-color: #3e8e41;
-}
-</style>
-<body>
-  <h1>按钮组</h1>
+                    <p><label for="password">密码：</label></p>
+                    <p><input type="password" id="password" name="password" class="loginInput" value="" /></p>
 
-<p>两个按钮组:</p>
-<div class="btn-group" style="width:100%">
-  <button style="width:50%">Apple</button>
-  <button style="width:50%">Sony</button>
-</div>
+                    <button class="loginBtn" onclick="window.parent.ExtFun('autorun.f0_login',text.value,password.value)">登录</button>
 
-<p>三个按钮组:</p>
-<div class="btn-group" style="width:100%">
-  <button style="width:33.3%">Apple</button>
-  <button style="width:33.3%">Samsung</button>
-  <button style="width:33.3%">Sony</button>
-</div>
+<script type="text/javascript">
 
-<p>四个按钮组:</p>
-<div class="btn-group" style="width:100%">
-  <button style="width:25%">Apple</button>
-  <button style="width:25%">Samsung</button>
-  <button style="width:25%">Sony</button>
-  <button style="width:25%">HTC</button>
-</div>
+window.parent.ExtFun('exe.maindlg.set_size',375,330,1,1)
+
+</script>
 </body>
+</html>
