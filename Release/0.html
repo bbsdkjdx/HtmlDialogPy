@@ -32,7 +32,7 @@
 
     </style>
 </head>
-<body onsubmit="alert('')">
+<body onkeydown="if(event.keyCode==13){login()}" >
 
                     <p><label for="username">用户名：</label></p>
                     <p><input type="text" id="text" name="text" class="loginInput" autofocus="autofocus" value="" /></p>
@@ -40,10 +40,10 @@
                     <p><label for="password">密码：</label></p>
                     <p><input type="password" id="password" name="password" class="loginInput" value="" /></p>
 
-                    <button class="loginBtn" onclick="window.parent.ExtFun('autorun.f0_login',text.value,password.value)">登录</button>
+                    <button class="loginBtn" onclick="login()">登录</button>
 
 <script type="text/javascript">
-
+function login(){window.parent.ExtFun('autorun.f0_login',text.value,password.value);}
 window.parent.ExtFun('exe.maindlg.set_size',375,330,1,1)
 
 </script>

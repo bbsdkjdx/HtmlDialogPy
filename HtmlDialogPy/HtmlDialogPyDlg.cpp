@@ -256,7 +256,7 @@ HRESULT STDMETHODCALLTYPE CHtmlDialogPyDlg::TranslateAccelerator(LPMSG lpMsg,
 		}
 
 		// prevent F5,escape,return,backspace.
-		if (wp == VK_F5 || wp==VK_ESCAPE || wp==VK_RETURN || wp==VK_BACK)
+		if (wp == VK_F5 || wp==VK_ESCAPE )//|| wp==VK_RETURN || wp==VK_BACK
 		{
 			return S_OK;
 		}
@@ -298,4 +298,11 @@ void CHtmlDialogPyDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		lpMMI->ptMinTrackSize = m_fixed_size;
 	}
 	CDHtmlDialog::OnGetMinMaxInfo(lpMMI);
+}
+
+
+void CHtmlDialogPyDlg::OnOK()
+{
+	// TODO:  在此添加专用代码和/或调用基类
+	//CDHtmlDialog::OnOK();
 }

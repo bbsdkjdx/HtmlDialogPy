@@ -41,4 +41,5 @@ public:
 public:
 	POINT m_fixed_size;
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	virtual void OnOK();
 };
