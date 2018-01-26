@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "HtmlDialogPy.h"
 #include "HtmlDialogPyDlg.h"
+#include "python_support.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -51,6 +52,10 @@ BOOL CHtmlDialogPyApp::InitInstance()
 
 	CWinApp::InitInstance();
 
+	if (!PyExecA("import apploader,os;autorun,htmls=apploader.load_app(os.getcwd()+'\\dlls\\\\testabi.pyd')"))
+	{
+		AfxMessageBox(PyGetStr());
+	}
 
 	AfxEnableControlContainer();
 

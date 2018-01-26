@@ -166,10 +166,6 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 		REG_EXE_FUN("maindlg", set_size, "#llll", "void set_size(int x, int y, int z, bool fixed);\nif x or y is -1,keep size. if z is -1 keep z-order.")
 		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "UINT get_browser_hwnd();\nget the browser hwnd ,for get html document.")
 
-	if (!PyExecA("import autorun"))
-	{
-		AfxMessageBox(PyGetStr());
-	}
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
