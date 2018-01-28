@@ -89,6 +89,7 @@ void set_size(int x, int y, int z, bool fixed)
 	if (z == -1)flag |= SWP_NOZORDER;
 	const CWnd *p_wnd_after = z ? &CWnd::wndTopMost : &CWnd::wndNoTopMost;
 	gpHtmlDialogPyDlg->SetWindowPos(p_wnd_after, 0, 0,x, y,  flag);
+	gpHtmlDialogPyDlg->CenterWindow();
 }
 
 

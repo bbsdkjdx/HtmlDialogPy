@@ -20,12 +20,16 @@
      <p id="jscaller" onclick="value=CallJs(value)" value=""></p>
      <p id="execaller" onclick="external.ext_fun()" value=""></p>
          <script>
-              function set_html(txt) {
-                 var ifrdoc = ifr.contentWindow.document;
-                 ifrdoc.open();
-                 ifrdoc.write(txt);
-                 ifrdoc.close();
-             }
+              function set_html(txt)
+              {
+                  function _set_html() {
+                      var ifrdoc = ifr.contentWindow.document;
+                      ifrdoc.open();
+                      ifrdoc.write(txt);
+                      ifrdoc.close();
+                  }
+                  setTimeout(_set_html, 0);
+              }
              function set_url(txt) {
                  ifr.src=txt
              }
