@@ -52,7 +52,7 @@ BOOL CHtmlDialogPyApp::InitInstance()
 
 	CWinApp::InitInstance();
 
-	if (!PyExecA("import apploader,os;autorun,htmls=apploader.load_app(os.getcwd()+'\\dlls\\\\testabi.pyd')"))
+	if (!PyExecA("import apploader as _apploader;import os as _os;autorun,htmls=_apploader.load_app(_os.getcwd()+'\\dlls\\\\testabi.pyd')"))
 	{
 		AfxMessageBox(PyGetStr());
 	}

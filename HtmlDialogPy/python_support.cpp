@@ -47,7 +47,7 @@ char *pre_code =
 
 "_thd_dict=dict()\n"
 //two caller in html to call back and forth.
-"def get_caller():\n"
+"def _get_caller():\n"
 "    import htmldoc\n"
 "    wnd=exe.maindlg.get_browser_hwnd()\n"
 "    doc=htmldoc.wnd2htmldoc(wnd)\n"
@@ -59,7 +59,7 @@ char *pre_code =
 //treate js call exe,
 "def _ext_fun():\n"
 "    if _get_thd_id() not in _thd_dict:\n"
-"        get_caller()\n"
+"        _get_caller()\n"
 "    _exe_caller=_thd_dict[_get_thd_id()]['_exe_caller']\n"
 "    fun,*para=_json.loads(_exe_caller.value)\n"
 "    try:\n"
@@ -73,7 +73,7 @@ char *pre_code =
 "def _call_js(fun_name,paras):\n"
 "    s1=_json.dumps([fun_name,paras])\n"
 "    if _get_thd_id() not in _thd_dict:\n"
-"        get_caller()\n"
+"        _get_caller()\n"
 "    _js_caller=_thd_dict[_get_thd_id()]['_js_caller']\n"
 "    _js_caller.value=s1\n"
 "    _js_caller.click()\n"
