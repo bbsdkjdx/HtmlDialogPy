@@ -39,7 +39,6 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	STDMETHOD(GetHostInfo)(DOCHOSTUIINFO *pInfo);
 public:
-	POINT m_fixed_size;
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	virtual void OnOK();
 };

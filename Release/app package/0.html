@@ -1,59 +1,9 @@
-
 <!doctype html>
 <html>
-<script type="text/javascript">
-    window.parent.ExtFun('exe.maindlg.set_size',1000,800,0,0)
-    window.parent.ExtFun('exe.maindlg.set_title','国土信息平台')
-</script>
 <head>
     <meta charset="utf-8">
-    <title>登陆界面</title>
     <style>
-        html {
-            background-color: #B5DEF2;
-        }
-        
-        .wrapper {
-            margin: 140px 0 140px auto;
-            width: 884px;
-        }
-        
-        .loginBox {
-            background-color: #F0F4F6;
-            /*上divcolor*/
-            border: 1px solid #BfD6E1;
-            border-radius: 5px;
-            color: #444;
-            font: 14px 'Microsoft YaHei', '微软雅黑';
-            margin: 0 auto;
-            width: 388px
-        }
-        
-        .loginBox .loginBoxCenter {
-            border-bottom: 1px solid #DDE0E8;
-            padding: 24px;
-        }
-        
-        .loginBox .loginBoxCenter p {
-            margin-bottom: 10px
-        }
-        
-        .loginBox .loginBoxButtons {
-            /*background-color: #F0F4F6;*/
-            /*下divcolor*/
-            border-top: 0px solid #FFF;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
-            line-height: 28px;
-            overflow: hidden;
-            padding: 20px 24px;
-            vertical-align: center;
-            filter: alpha(Opacity=80);
-            -moz-opacity: 0.5;
-            opacity: 0.5;
-        }
-        
-        .loginBox .loginInput {
+         .loginInput {
             border: 1px solid #D2D9dC;
             border-radius: 2px;
             color: #444;
@@ -63,16 +13,14 @@
             width: 310px;
         }
         
-        .loginBox .loginInput:FOCUS {
-            border: 1px solid #B7D4EA;
-            box-shadow: 0 0 8px #B7D4EA;
+         .loginInput:FOCUS {
+            border: 2px solid #B7D4EA;
         }
         
-        .loginBox .loginBtn {
+         .loginBtn {
             background-image: -moz-linear-gradient(to bottom, blue, #85CFEE);
             border: 1px solid #98CCE7;
-            border-radius: 20px;
-            box-shadow: inset rgba(255, 255, 255, 0.6) 0 1px 1px, rgba(0, 0, 0, 0.1) 0 1px 1px;
+
             color: #444;
             /*登录*/
             cursor: pointer;
@@ -81,36 +29,19 @@
             padding: 10px 50px;
         }
         
-        .loginBox .loginBtn:HOVER {
-            background-image: -moz-linear-gradient(to top, blue, #85CFEE);
-        }
-        
-        .loginBox input#remember {
-            vertical-align: middle;
-        }
-        
-        .loginBox label[for="remember"] {
-            font: 11px Arial;
-        }
+
     </style>
 </head>
-<body>
-    <div class="wrapper">
-        <form >
-            <div class="loginBox">
-                <div class="loginBoxCenter">
-                    <p><label for="username">用户名：</label></p>
-                    <p><input type="text" id="text" name="text" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入邮箱/手机号" value="" /></p>
-                    <p><label for="password">密码：</label></p>
-                    <p><input type="password" id="password" name="password" class="loginInput" required="required" placeholder="请输入密码" value="" /></p>
-                </div>
-                <div class="loginBoxButtons">
-                    <button class="loginBtn" onclick=" window.parent.ExtFun('autorun.load_htmls','1.html')">登录</button>
-                </div>
-            </div>
-        </form>
-    </div>
+<body onkeydown="if(event.keyCode==13){login()}" >
+
+    <p><label for="username">用户名：</label><input type="text" id="text" name="text" class="loginInput" autofocus="autofocus" value="" /></p>
+    <p><label for="password">密码：</label><input type="password" id="password" name="password" class="loginInput" value="" /></p>
+    <p><button class="loginBtn" onclick="login()">登录</button></p>
+
+<script type="text/javascript">
+function login(){window.parent.ExtFun('autorun.f0_login',text.value,password.value);}
+window.parent.ExtFun('exe.maindlg.set_size',375,330,1)
+window.parent.ExtFun('exe.maindlg.set_title','环翠国土电子档案查询系统')
+</script>
 </body>
-
-
 </html>

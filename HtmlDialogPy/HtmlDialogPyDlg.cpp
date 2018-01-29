@@ -62,8 +62,9 @@ CHtmlDialogPyDlg *gpHtmlDialogPyDlg = nullptr;
 
 //functions export to python./////////////////////////////////////////////////////////////////////////////
 void set_title(WCHAR *s) { if (gpHtmlDialogPyDlg)gpHtmlDialogPyDlg->SetWindowTextW(s); }
+void set_maxmize(){	if (gpHtmlDialogPyDlg)gpHtmlDialogPyDlg->ShowWindow(SW_MAXIMIZE);}
 
-void set_size(int x, int y, int z, bool fixed)
+void set_size(int x, int y, int z)
 {
 	if (!gpHtmlDialogPyDlg)return;
 
@@ -74,21 +75,12 @@ void set_size(int x, int y, int z, bool fixed)
 		x = rct.Width();
 		y = rct.Height();
 	}
-
-	if (fixed)
-	{
-		gpHtmlDialogPyDlg->m_fixed_size = { x, y };
-	}
-	else
-	{
-		gpHtmlDialogPyDlg->m_fixed_size = { 0, 0 };
-	}
-
 	
 	DWORD flag=SWP_NOMOVE;
 	if (z == -1)flag |= SWP_NOZORDER;
 	const CWnd *p_wnd_after = z ? &CWnd::wndTopMost : &CWnd::wndNoTopMost;
 	gpHtmlDialogPyDlg->SetWindowPos(p_wnd_after, 0, 0,x, y,  flag);
+	gpHtmlDialogPyDlg->ShowWindow(SW_NORMAL);
 	gpHtmlDialogPyDlg->CenterWindow();
 }
 
@@ -110,7 +102,6 @@ UINT get_browser_hwnd()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CHtmlDialogPyDlg::CHtmlDialogPyDlg(CWnd* pParent /*=NULL*/)
 : CDHtmlDialog(CHtmlDialogPyDlg::IDD, CHtmlDialogPyDlg::IDH, pParent)
-, m_fixed_size()
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	gpHtmlDialogPyDlg = this;
@@ -164,8 +155,9 @@ BOOL CHtmlDialogPyDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化代码
 	REG_EXE_FUN("maindlg", set_title, "#S", "void set_title(WCHAR *s);\nset window title")
-		REG_EXE_FUN("maindlg", set_size, "#llll", "void set_size(int x, int y, int z, bool fixed);\nif x or y is -1,keep size. if z is -1 keep z-order.")
+		REG_EXE_FUN("maindlg", set_size, "#lll", "void set_size(int x, int y, int z);\nif x or y is -1,keep size. if z is -1 keep z-order.")
 		REG_EXE_FUN("maindlg", get_browser_hwnd, "u", "UINT get_browser_hwnd();\nget the browser hwnd ,for get html document.")
+		REG_EXE_FUN("maindlg", set_maxmize, "u", "void set_maxmize();\nmaximize window.")
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -289,11 +281,11 @@ STDMETHODIMP CHtmlDialogPyDlg::GetHostInfo(DOCHOSTUIINFO *pInfo)
 void CHtmlDialogPyDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
-	if (m_fixed_size.x!=0 && m_fixed_size.y!=0)
-	{
-		lpMMI->ptMaxTrackSize = m_fixed_size;
-		lpMMI->ptMinTrackSize = m_fixed_size;
-	}
+	//if (m_fixed_size.x!=0 && m_fixed_size.y!=0)
+	//{
+	//	lpMMI->ptMaxTrackSize = m_fixed_size;
+	//	lpMMI->ptMinTrackSize = m_fixed_size;
+	//}
 	CDHtmlDialog::OnGetMinMaxInfo(lpMMI);
 }
 
