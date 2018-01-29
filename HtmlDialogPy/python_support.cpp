@@ -269,52 +269,57 @@ void reg_exe_fun(char *mod,char *fnn, char *fmt, void *pfn,char *doc)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool has_thread = false;//indicate that has a console thread.
 
 struct ThreadParameter
 {
 	HWND hwn_parent;
 };
+HANDLE h_con_thd = NULL;
+
 void _InteractInConsole(void *para)
 {
-	CGIL gil;
-	HWND hwn = ::GetConsoleWindow();
-	CoInitializeEx(0, 0);
-	if (!hwn)
+	for (;;)
 	{
-		AllocConsole();
-		SetConsoleTitleA("press Ctrl+C to quit.");
-		hwn = ::GetConsoleWindow();
+		CGIL gil;
+		HWND hwn = ::GetConsoleWindow();
+		CoInitializeEx(0, 0);
+		if (!hwn)
+		{
+			AllocConsole();
+			SetConsoleTitleA("press Ctrl+C to quit.");
+			hwn = ::GetConsoleWindow();
 
-		HMENU mn = ::GetSystemMenu(hwn, FALSE);
-		if (mn)DeleteMenu(mn, SC_CLOSE, MF_BYCOMMAND);
+			HMENU mn = ::GetSystemMenu(hwn, FALSE);
+			if (mn)DeleteMenu(mn, SC_CLOSE, MF_BYCOMMAND);
 
-		HANDLE hdlWrite = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute((HANDLE)hdlWrite, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+			HANDLE hdlWrite = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute((HANDLE)hdlWrite, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-		char *cmd1 = "import sys as _sys;_sys.stdout=open('CONOUT$', 'wt');_sys.stderr=_sys.stdout;_sys.stdin=open('CONIN$', 'rt')";
-		if (!PyExecA(cmd1))AfxMessageBox(PyGetStr());
-		SetConsoleCtrlHandler(0, true);//handle Ctrl+C.
+			char *cmd1 = "import sys as _sys;_sys.stdout=open('CONOUT$', 'wt');_sys.stderr=_sys.stdout;_sys.stdin=open('CONIN$', 'rt')";
+			if (!PyExecA(cmd1))AfxMessageBox(PyGetStr());
+			SetConsoleCtrlHandler(0, true);//handle Ctrl+C.
+		}
+
+		ShowWindow(hwn, SW_SHOW);
+		SetWindowPos(hwn, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+		SetForegroundWindow(hwn);
+
+	//	HANDLE hdlRead = GetStdHandle(STD_INPUT_HANDLE);
+		char *cmd2 = "import code as _code;_code.interact(banner='', readfunc=None, local=locals())";
+		if (!PyExecA(cmd2))AfxMessageBox(PyGetStr());
+
+
+		ShowWindow(hwn, SW_HIDE);
+		ThreadParameter *p = (ThreadParameter*)para;
+		if (p->hwn_parent)
+		{
+			SetForegroundWindow(p->hwn_parent);
+		}
+		SuspendThread(h_con_thd);
 	}
 
-	ShowWindow(hwn, SW_SHOW);
-	SetWindowPos(hwn, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-	SetForegroundWindow(hwn);
-
-//	HANDLE hdlRead = GetStdHandle(STD_INPUT_HANDLE);
-	char *cmd2 = "import code as _code;_code.interact(banner='', readfunc=None, local=locals())";
-	if (!PyExecA(cmd2))AfxMessageBox(PyGetStr());
-
-
-	ShowWindow(hwn, SW_HIDE);
-	ThreadParameter *p = (ThreadParameter*)para;
-	if (p->hwn_parent)
-	{
-		SetForegroundWindow(p->hwn_parent);
-	}
-	has_thread = false;
-//	FreeConsole();
 }
+
 
 void InteractInConsole(HWND parent_wnd, bool block)
 {
@@ -326,10 +331,13 @@ void InteractInConsole(HWND parent_wnd, bool block)
 	}
 	else
 	{
-		if (!has_thread)
+		if (!h_con_thd)
 		{
-			_beginthread(_InteractInConsole, 0, &tp);
-			has_thread = true;
+			h_con_thd=(HANDLE)_beginthread(_InteractInConsole, 0, &tp);
+		}
+		else
+		{
+			ResumeThread(h_con_thd);
 		}
 	}
 }
